@@ -4,29 +4,23 @@ import { matchLast } from "/hooks/util.js";
 import { registerTransform } from "../../mixin.js";
 const registry = new Registry();
 export default registry;
-export const useMenuItem = () => S.React.useContext(globalThis.__MenuContext);
-globalThis.__renderMenuItems = () => {
-	const context = useMenuItem();
-	return registry.getItems(context);
+export const useMenuItem = ()=>S.React.useContext(globalThis.__MenuContext);
+globalThis.__renderMenuItems = ()=>{
+    const context = useMenuItem();
+    return registry.getItems(context);
 };
 registerTransform({
-	transform: emit => str => {
-		str = str.replace(/("Menu".+?children:)([a-zA-Z_\$][\w\$]*)/, "$1[__renderMenuItems(),$2].flat()");
-		const croppedInput = str.match(/.*value:"contextmenu"/)[0];
-		const react = matchLast(croppedInput, /([a-zA-Z_\$][\w\$]*)\.useRef/g)[1];
-		const menu = matchLast(croppedInput, /menu:([a-zA-Z_\$][\w\$]*)/g)[1];
-		const trigger = matchLast(croppedInput, /trigger:([a-zA-Z_\$][\w\$]*)/g)[1];
-		const target = matchLast(croppedInput, /triggerRef:([a-zA-Z_\$][\w\$]*)/g)[1];
-		str = str.replace(
-			/(\(0,([a-zA-Z_\$][\w\$]*)\.jsx\)\([a-zA-Z_\$][\w\$]*\.[a-zA-Z_\$][\w\$]*,\{value:"contextmenu"[^\}]*\}\)\}\))/,
-			`$2.jsx((globalThis.__MenuContext||(globalThis.__MenuContext=${react}.createContext(null))).Provider,{value:{props:${menu}?.props,trigger:${trigger},target:${target}},children:$1})`,
-		);
-		emit();
-		return str;
-	},
-	glob: /^\/xpui\.js/,
+    transform: (emit)=>(str)=>{
+            str = str.replace(/("Menu".+?children:)([a-zA-Z_\$][\w\$]*)/, "$1[__renderMenuItems(),$2].flat()");
+            const croppedInput = str.match(/.*value:"contextmenu"/)[0];
+            const react = matchLast(croppedInput, /([a-zA-Z_\$][\w\$]*)\.useRef/g)[1];
+            const menu = matchLast(croppedInput, /menu:([a-zA-Z_\$][\w\$]*)/g)[1];
+            const trigger = matchLast(croppedInput, /trigger:([a-zA-Z_\$][\w\$]*)/g)[1];
+            const target = matchLast(croppedInput, /triggerRef:([a-zA-Z_\$][\w\$]*)/g)[1];
+            str = str.replace(/(\(0,([a-zA-Z_\$][\w\$]*)\.jsx\)\([a-zA-Z_\$][\w\$]*\.[a-zA-Z_\$][\w\$]*,\{value:"contextmenu"[^\}]*\}\)\}\))/, `$2.jsx((globalThis.__MenuContext||(globalThis.__MenuContext=${react}.createContext(null))).Provider,{value:{props:${menu}?.props,trigger:${trigger},target:${target}},children:$1})`);
+            emit();
+            return str;
+        },
+    glob: /^\/xpui\.js/
 });
-export const createProfileMenuShouldAdd =
-	() =>
-	({ trigger, target }) =>
-		trigger === "click" && target.parentElement?.classList.contains("rwdnt1SmeRC_lhLVfIzg");
+export const createProfileMenuShouldAdd = ()=>({ trigger, target })=>trigger === "click" && target.parentElement?.classList.contains("rwdnt1SmeRC_lhLVfIzg");
