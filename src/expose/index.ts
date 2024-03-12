@@ -34,7 +34,7 @@ export const S = {} as ExposedPlatform & ExposedWebpack & ExposedOther;
 
 registerTransform<Tippy>({
 	transform: emit => str => {
-		str = str.replace(/(([\w_\$][\w_\$\d]*)\.setDefaultProps=)/, "__Tippy=$2;$1");
+		str = str.replace(/(([a-zA-Z_\$][\w\$]*)\.setDefaultProps=)/, "__Tippy=$2;$1");
 		Object.defineProperty(globalThis, "__Tippy", {
 			set: emit,
 		});
@@ -48,7 +48,7 @@ registerTransform<Tippy>({
 
 registerTransform<Platform>({
 	transform: emit => str => {
-		str = str.replace(/(setTitlebarHeight[\w(){}.,&$!=;"" ]+)(\{version:[\w_\$][\w_\$\d]*,)/, "$1__Platform=$2");
+		str = str.replace(/(setTitlebarHeight[\w(){}.,&$!=;"" ]+)(\{version:[a-zA-Z_\$][\w\$]*,)/, "$1__Platform=$2");
 		Object.defineProperty(globalThis, "__Platform", {
 			set: emit,
 		});
@@ -64,7 +64,7 @@ registerTransform<Platform>({
 registerTransform<ReduxStore>({
 	transform: emit => str => {
 		str = str.replace(
-			/(,[\w_\$][\w_\$\d]*=)(([$\w,.:=;(){}]+\(\{session:[\w_\$][\w_\$\d]*,features:[\w_\$][\w_\$\d]*,seoExperiment:[\w_\$][\w_\$\d]*\}))/,
+			/(,[a-zA-Z_\$][\w\$]*=)(([$\w,.:=;(){}]+\(\{session:[a-zA-Z_\$][\w\$]*,features:[a-zA-Z_\$][\w\$]*,seoExperiment:[a-zA-Z_\$][\w\$]*\}))/,
 			"$1__ReduxStore=$2",
 		);
 		Object.defineProperty(globalThis, "__ReduxStore", {
@@ -80,7 +80,7 @@ registerTransform<ReduxStore>({
 
 registerTransform<Snackbar>({
 	transform: emit => str => {
-		str = str.replace(/(\.call\(this,[\w_\$][\w_\$\d]*\)\|\|this\)\.enqueueSnackbar)/, "$1=__Snackbar");
+		str = str.replace(/(\.call\(this,[a-zA-Z_\$][\w\$]*\)\|\|this\)\.enqueueSnackbar)/, "$1=__Snackbar");
 		let __Snackbar = undefined;
 		Object.defineProperty(globalThis, "__Snackbar", {
 			set: value => {
@@ -117,7 +117,10 @@ registerTransform<any>({
 
 registerTransform<ReactFlipToolkitSpring>({
 	transform: emit => str => {
-		str = str.replace(/([\w_\$][\w_\$\d]*)=((?:function|\()([\w$.,{}()= ]+(?:springConfig|overshootClamping)){2})/, "$1=__ReactFlipToolkitSpring=$2");
+		str = str.replace(
+			/([a-zA-Z_\$][\w\$]*)=((?:function|\()([\w$.,{}()= ]+(?:springConfig|overshootClamping)){2})/,
+			"$1=__ReactFlipToolkitSpring=$2",
+		);
 		Object.defineProperty(globalThis, "__ReactFlipToolkitSpring", { set: emit });
 		return str;
 	},
@@ -130,7 +133,7 @@ registerTransform<ReactFlipToolkitSpring>({
 registerTransform({
 	transform: emit => str => {
 		const matches = str.matchAll(
-			/(=new [\w_\$][\w_\$\d]*\.[\w_\$][\w_\$\d]*\("(?<name>\w+)","(?<operation>query|mutation)","(?<sha256Hash>[\w\d]{64})",null\))/g,
+			/(=new [a-zA-Z_\$][\w\$]*\.[a-zA-Z_\$][\w\$]*\("(?<name>\w+)","(?<operation>query|mutation)","(?<sha256Hash>[\w\d]{64})",null\))/g,
 		);
 		S.GraphQLDefinitions = {
 			query: {},
@@ -148,7 +151,7 @@ registerTransform({
 
 registerTransform<SettingsSection>({
 	transform: emit => str => {
-		str = str.replace(/(\.jsxs\)\()([\w_\$][\w_\$\d]*)([^=]*"desktop.settings.compatibility")/, "$1(__SettingsSection=$2)$3");
+		str = str.replace(/(\.jsxs\)\()([a-zA-Z_\$][\w\$]*)([^=]*"desktop.settings.compatibility")/, "$1(__SettingsSection=$2)$3");
 		Object.defineProperty(globalThis, "__SettingsSection", { set: emit });
 		return str;
 	},
@@ -161,7 +164,7 @@ registerTransform<SettingsSection>({
 
 registerTransform<SettingsSectionTitle>({
 	transform: emit => str => {
-		str = str.replace(/("desktop.settings.compatibility"[^=]*?\.jsx\)\()([\w_\$][\w_\$\d]*)/, "$1(__SettingsSectionTitle=$2)");
+		str = str.replace(/("desktop.settings.compatibility"[^=]*?\.jsx\)\()([a-zA-Z_\$][\w\$]*)/, "$1(__SettingsSectionTitle=$2)");
 		Object.defineProperty(globalThis, "__SettingsSectionTitle", { set: emit });
 		return str;
 	},

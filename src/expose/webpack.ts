@@ -389,7 +389,7 @@ export function expose({ Snackbar, Platform }: { Snackbar: Snackbar; Platform: P
 	const ReactRouterModule = Object.values(require(ReactRouterModuleID));
 
 	// https://github.com/remix-run/react-router/blob/main/packages/react-router/lib/hooks.tsx#L131
-	const useMatch = findBy("let{pathname:", /\(([\w_\$][\w_\$\d]*),([\w_\$][\w_\$\d]*)\)\),\[\2,\1\]/)(ReactRouterModule);
+	const useMatch = findBy("let{pathname:", /\(([a-zA-Z_\$][\w\$]*),([a-zA-Z_\$][\w\$]*)\)\),\[\2,\1\]/)(ReactRouterModule);
 
 	const useContextMenuState = findBy("useContextMenuState")(exportedFunctions);
 
@@ -424,7 +424,7 @@ export function expose({ Snackbar, Platform }: { Snackbar: Snackbar; Platform: P
 		notifyManager: modules.find(m => m.setBatchNotifyFunction) as notifyManager,
 		useMutation: findBy("mutateAsync")(exportedFunctions) as useMutation,
 		useQuery: findBy(
-			/^function [\w_\$][\w_\$\d]*\(([\w_\$][\w_\$\d]*),([\w_\$][\w_\$\d]*)\)\{return\(0,[\w_\$][\w_\$\d]*\.[\w_\$][\w_\$\d]*\)\(\1,[\w_\$][\w_\$\d]*\.[\w_\$][\w_\$\d]*,\2\)\}$/,
+			/^function [a-zA-Z_\$][\w\$]*\(([a-zA-Z_\$][\w\$]*),([a-zA-Z_\$][\w\$]*)\)\{return\(0,[a-zA-Z_\$][\w\$]*\.[a-zA-Z_\$][\w\$]*\)\(\1,[a-zA-Z_\$][\w\$]*\.[a-zA-Z_\$][\w\$]*,\2\)\}$/,
 		)(exportedFunctions) as useQuery,
 		useQueryClient: findBy("client", "Provider", "mount")(exportedFunctions) as useQueryClient,
 		useSuspenseQuery: findBy("throwOnError", "suspense", "enabled")(exportedFunctions) as useSuspenseQuery,

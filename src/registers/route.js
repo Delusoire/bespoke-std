@@ -4,10 +4,13 @@ const registry = new Registry();
 export default registry;
 globalThis.__renderRoutes = registry.getItems.bind(registry);
 registerTransform({
-    transform: (emit)=>(str)=>{
-            str = str.replace(/(\(0,[\w_\$][\w_\$\d]*\.jsx\)\([\w_\$][\w_\$\d]*\.[\w_\$][\w_\$\d]*,\{[^\{]*path:"\/search\/\*")/, "...__renderRoutes(),$1");
-            emit();
-            return str;
-        },
-    glob: /^\/xpui\.js/
+	transform: emit => str => {
+		str = str.replace(
+			/(\(0,[a-zA-Z_\$][\w\$]*\.jsx\)\([a-zA-Z_\$][\w\$]*\.[a-zA-Z_\$][\w\$]*,\{[^\{]*path:"\/search\/\*")/,
+			"...__renderRoutes(),$1",
+		);
+		emit();
+		return str;
+	},
+	glob: /^\/xpui\.js/,
 });
