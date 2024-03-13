@@ -52,4 +52,4 @@ registerTransform({
 export const createProfileMenuShouldAdd =
 	() =>
 	({ trigger, target }: MenuContext) =>
-		trigger === "click" && target.parentElement?.classList.contains("main-topBar-topbarContentRight");
+		trigger === "click" && target.getAttribute("data-testid") === "user-widget-link";
