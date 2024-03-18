@@ -53,12 +53,22 @@ export default function <O extends DropdownOptions>({ options, activeOption, onS
 		);
 	};
 
+	if (Object.keys(options).length === 1) {
+		return (
+			<button className="x-sortBox-sortDropdown" type="button" role="combobox" aria-expanded="false">
+				<TextComponent variant="mesto" semanticColor="textSubdued">
+					{options[activeOption]}
+				</TextComponent>
+			</button>
+		);
+	}
+
 	return (
 		<ContextMenu menu={<DropdownMenu />} trigger="click">
 			<button className="x-sortBox-sortDropdown" type="button" role="combobox" aria-expanded="false">
-				{/* <TextComponent variant="mesto" semanticColor="textSubdued">
+				<TextComponent variant="mesto" semanticColor="textSubdued">
 					{options[activeOption]}
-				</TextComponent> */}
+				</TextComponent>
 				<svg
 					role="img"
 					height="16"
@@ -67,6 +77,7 @@ export default function <O extends DropdownOptions>({ options, activeOption, onS
 					className="Svg-img-16 Svg-img-16-icon Svg-img-icon Svg-img-icon-small"
 					viewBox="0 0 16 16"
 					data-encore-id="icon"
+					fill="currentColor"
 				>
 					<path d="m14 6-6 6-6-6h12z" />
 				</svg>
