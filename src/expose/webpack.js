@@ -179,7 +179,7 @@ const exposeWebpack = ()=>{
     };
 };
 // TODO: extract functions
-export function expose({ Snackbar, Platform }) {
+export function expose({ Snackbar, Platform, React }) {
     const webpack = exposeWebpack();
     const { require, chunks, modules, exports, exportedFunctions, exportedContexts, exportedForwardRefs, exportedMemos } = webpack;
     const [ReactRouterModuleID] = chunks.find(([_, v])=>v.toString().includes("React Router"));
@@ -188,7 +188,6 @@ export function expose({ Snackbar, Platform }) {
     const useMatch = findBy("let{pathname:", /\(([a-zA-Z_\$][\w\$]*),([a-zA-Z_\$][\w\$]*)\)\),\[\2,\1\]/)(ReactRouterModule);
     const useContextMenuState = findBy("useContextMenuState")(exportedFunctions);
     const enqueueCustomSnackbar = findBy("enqueueCustomSnackbar", "headless")(exportedFunctions);
-    const React = modules.find((m)=>m.createElement);
     const ReactJSX = modules.find((m)=>m.jsx);
     const ReactDOM = modules.find((m)=>m.createRoot);
     const ReactDOMServer = modules.find((m)=>m.renderToString);
@@ -242,7 +241,6 @@ export function expose({ Snackbar, Platform }) {
         FilterContext,
         useContextMenuState,
         enqueueCustomSnackbar,
-        React,
         ReactJSX,
         ReactDOM,
         ReactDOMServer,

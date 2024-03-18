@@ -3,9 +3,14 @@ import { S } from "../expose/index.js";
 import { findMatchingPos } from "/hooks/util.js";
 import { createIconComponent } from "../../lib/createIconComponent.js";
 import { registerTransform } from "../../mixin.js";
-const registry = new Registry();
+const registry = new Registry(()=>refreshNavLinks() || true, ()=>refreshNavLinks() || true);
 export default registry;
-globalThis.__renderNavLinks = ()=>registry.getItems().map((Item)=>/*#__PURE__*/ S.React.createElement(Item, null));
+let refreshNavLinks;
+globalThis.__renderNavLinks = ()=>{
+    const [refreshCount, refresh] = S.React.useReducer((x)=>x + 1, 0);
+    refreshNavLinks = refresh;
+    return S.React.createElement(()=>registry.getItems().map((Item)=>/*#__PURE__*/ S.React.createElement(Item, null)));
+};
 registerTransform({
     transform: (emit)=>(str)=>{
             const j = str.search(/\("li",\{[^\{]*\{[^\{]*\{to:"\/search/);
@@ -14,7 +19,7 @@ registerTransform({
                 ")"
             ], 1);
             emit();
-            return `${str.slice(0, i)},...__renderNavLinks()${str.slice(i)}`;
+            return `${str.slice(0, i)},__renderNavLinks()${str.slice(i)}`;
         },
     glob: /^\/xpui\.js/
 });

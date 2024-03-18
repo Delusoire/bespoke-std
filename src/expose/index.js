@@ -2,6 +2,19 @@ import { registerTransform } from "../../mixin.js";
 export const S = {};
 registerTransform({
     transform: (emit)=>(str)=>{
+            str = str.replace(/([a-zA-Z_\$][\w\$]*\.prototype\.setState=)/, "__React=t;$1");
+            Object.defineProperty(globalThis, "__React", {
+                set: emit
+            });
+            return str;
+        },
+    then: (React)=>{
+        S.React = React;
+    },
+    glob: /^\/vendor~xpui\.js/
+});
+registerTransform({
+    transform: (emit)=>(str)=>{
             str = str.replace(/(([a-zA-Z_\$][\w\$]*)\.setDefaultProps=)/, "__Tippy=$2;$1");
             Object.defineProperty(globalThis, "__Tippy", {
                 set: emit
@@ -93,13 +106,13 @@ registerTransform({
     },
     glob: /^\/vendor~xpui\.js/
 });
+S.GraphQLDefinitions = {
+    query: {},
+    mutation: {}
+};
 registerTransform({
     transform: (emit)=>(str)=>{
             const matches = str.matchAll(/(=new [a-zA-Z_\$][\w\$]*\.[a-zA-Z_\$][\w\$]*\("(?<name>\w+)","(?<operation>query|mutation)","(?<sha256Hash>[\w\d]{64})",null\))/g);
-            S.GraphQLDefinitions = {
-                query: {},
-                mutation: {}
-            };
             for (const match of matches){
                 const { name, operation, sha256Hash } = match.groups;
                 S.GraphQLDefinitions[operation][name] = {

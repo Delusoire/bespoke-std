@@ -6,6 +6,11 @@ export class Registry<A, B> {
 
 	private registered = new Map<A, Predicate<B>>();
 
+	constructor(
+		private onRegister: Predicate<A> = () => true,
+		private onUnregister: Predicate<A> = () => true,
+	) {}
+
 	getItems(input: B, reverse = false) {
 		const items = Array.from(this.registered.entries())
 			.map(([i, p]) => p(input) && i)
@@ -15,12 +20,12 @@ export class Registry<A, B> {
 	}
 
 	register(item: A, predicate: Predicate<B>) {
-		this.registered.set(item, predicate);
+		this.onRegister(item) && this.registered.set(item, predicate);
 		return item;
 	}
 
 	unregister(item: A) {
-		this.registered.delete(item);
+		this.onUnregister(item) && this.registered.delete(item);
 		return item;
 	}
 }

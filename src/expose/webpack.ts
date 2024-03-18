@@ -10,7 +10,6 @@ import type {
 import type { Flipped as FlippedT, Flipper as FlipperT } from "react-flip-toolkit";
 import type { SnackbarProvider as SnackbarProviderT, useSnackbar as useSnackbarT } from "notistack";
 import type SnackbarT from "notistack";
-import type ReactT from "react";
 import type ReactDOMT from "react-dom";
 import type ReactDOMServerT from "react-dom/server";
 import type classNamesT from "classnames";
@@ -40,7 +39,6 @@ export type SnackbarProvider = SnackbarProviderT;
 export type useSnackbar = typeof useSnackbarT;
 
 export type Snackbar = typeof SnackbarT;
-export type React = typeof ReactT;
 export type ReactDOM = typeof ReactDOMT;
 export type ReactDOMServer = typeof ReactDOMServerT;
 export type classNames = typeof classNamesT;
@@ -207,7 +205,9 @@ const exposeReactComponents = (
 		SettingToggle: findBy("condensed", "onSelected")(exportedFCs),
 
 		IconComponent: findBy("$iconColor", 'role:"img"')(exportedFCs),
-		Text: exportedForwardRefs.find(m => (m as any).render.toString().includes("paddingBottom") && (m as any).render.toString().includes("className")),
+		Text: exportedForwardRefs.find(
+			m => (m as any).render.toString().includes("paddingBottom") && (m as any).render.toString().includes("className"),
+		),
 		TextComponent: exports.find(m => m.h1 && m.render),
 
 		ContextMenu: Object.values(require(ContextMenuModuleID))[0],
@@ -229,7 +229,8 @@ const exposeReactComponents = (
 		Scrollable: findBy("applyLightThemeControls")(exportedFunctions) as React.FC<any>,
 
 		PanelHeader: exportedFCs.find(m => m.toString().includes("panel") && m.toString().includes("actions")),
-		PanelContent: findBy(m => m.render.toString().includes("scrollBarContainer"))(exportedForwardRefs) || findBy("scrollBarContainer")(exportedFCs),
+		PanelContent:
+			findBy(m => m.render.toString().includes("scrollBarContainer"))(exportedForwardRefs) || findBy("scrollBarContainer")(exportedFCs),
 		PanelSkeleton: findBy("label", "aside")(exportedFCs) || findBy(m => m.render.toString().includes("section"))(exportedForwardRefs),
 
 		ButtonPrimary: findBy(m => m.displayName === "ButtonPrimary")(exportedForwardRefs),
@@ -381,7 +382,7 @@ const exposeWebpack = () => {
 };
 
 // TODO: extract functions
-export function expose({ Snackbar, Platform }: { Snackbar: Snackbar; Platform: Platform }) {
+export function expose({ Snackbar, Platform, React }: { Snackbar: Snackbar; Platform: Platform; React: React }) {
 	const webpack = exposeWebpack();
 	const { require, chunks, modules, exports, exportedFunctions, exportedContexts, exportedForwardRefs, exportedMemos } = webpack;
 
@@ -399,7 +400,6 @@ export function expose({ Snackbar, Platform }: { Snackbar: Snackbar; Platform: P
 		opts: FN_enqueueCustomSnackbar_OPTS,
 	) => ReturnType<EnqueueSnackbar>;
 
-	const React = modules.find(m => m.createElement) as React;
 	const ReactJSX = modules.find(m => m.jsx);
 	const ReactDOM = modules.find(m => m.createRoot) as ReactDOM;
 	const ReactDOMServer = modules.find(m => m.renderToString) as ReactDOMServer;
@@ -415,7 +415,9 @@ export function expose({ Snackbar, Platform }: { Snackbar: Snackbar; Platform: P
 		),
 	};
 
-	const [infiniteQueryChunkID] = chunks.find(([_, v]) => v.toString().includes("fetchPreviousPage") && v.toString().includes("getOptimisticResult"));
+	const [infiniteQueryChunkID] = chunks.find(
+		([_, v]) => v.toString().includes("fetchPreviousPage") && v.toString().includes("getOptimisticResult"),
+	);
 
 	const ReactQuery = {
 		PersistQueryClientProvider: findBy("persistOptions")(exportedFunctions),
@@ -467,7 +469,6 @@ export function expose({ Snackbar, Platform }: { Snackbar: Snackbar; Platform: P
 		FilterContext,
 		useContextMenuState,
 		enqueueCustomSnackbar,
-		React,
 		ReactJSX,
 		ReactDOM,
 		ReactDOMServer,

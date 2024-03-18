@@ -4,17 +4,26 @@ import { findMatchingPos } from "/hooks/util.js";
 import { createIconComponent } from "../../lib/createIconComponent.js";
 import { registerTransform } from "../../mixin.js";
 
-const registry = new Registry<React.FC, void>();
+const registry = new Registry<React.FC, void>(
+	() => refreshNavLinks() || true,
+	() => refreshNavLinks() || true,
+);
 export default registry;
 
-globalThis.__renderNavLinks = () => registry.getItems().map(Item => <Item />);
+let refreshNavLinks: React.DispatchWithoutAction | undefined;
+globalThis.__renderNavLinks = () => {
+	const [refreshCount, refresh] = S.React.useReducer(x => x + 1, 0);
+	refreshNavLinks = refresh;
+
+	return S.React.createElement(() => registry.getItems().map(Item => <Item />));
+};
 registerTransform({
 	transform: emit => str => {
 		const j = str.search(/\("li",\{[^\{]*\{[^\{]*\{to:"\/search/);
 		const i = findMatchingPos(str, j, 1, ["(", ")"], 1);
 
 		emit();
-		return `${str.slice(0, i)},...__renderNavLinks()${str.slice(i)}`;
+		return `${str.slice(0, i)},__renderNavLinks()${str.slice(i)}`;
 	},
 	glob: /^\/xpui\.js/,
 });

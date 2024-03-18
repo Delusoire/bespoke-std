@@ -4,6 +4,8 @@ import type { ExposedWebpack, Snackbar } from "./webpack.js";
 import type { Tippy } from "tippy.js";
 import type { spring } from "react-flip-toolkit";
 import type { Store } from "redux";
+import type ReactT from "react";
+export type React = typeof ReactT;
 
 export type GraphQLDefinitionOperations = "query" | "mutation";
 export type GraphQLDefinition<N extends string, O extends GraphQLDefinitionOperations> = {
@@ -25,12 +27,27 @@ export type ExposedOther = {
 	enqueueImageSnackbar: any;
 	ReduxStore: ReduxStore;
 	Tippy: Tippy;
+	React: React;
 	ReactFlipToolkitSpring: ReactFlipToolkitSpring;
 	SettingsSection: SettingsSection;
 	SettingsSectionTitle: SettingsSectionTitle;
 };
 
 export const S = {} as ExposedPlatform & ExposedWebpack & ExposedOther;
+
+registerTransform<React>({
+	transform: emit => str => {
+		str = str.replace(/([a-zA-Z_\$][\w\$]*\.prototype\.setState=)/, "__React=t;$1");
+		Object.defineProperty(globalThis, "__React", {
+			set: emit,
+		});
+		return str;
+	},
+	then: React => {
+		S.React = React;
+	},
+	glob: /^\/vendor~xpui\.js/,
+});
 
 registerTransform<Tippy>({
 	transform: emit => str => {
@@ -130,15 +147,15 @@ registerTransform<ReactFlipToolkitSpring>({
 	glob: /^\/vendor~xpui\.js/,
 });
 
+S.GraphQLDefinitions = {
+	query: {},
+	mutation: {},
+};
 registerTransform({
 	transform: emit => str => {
 		const matches = str.matchAll(
 			/(=new [a-zA-Z_\$][\w\$]*\.[a-zA-Z_\$][\w\$]*\("(?<name>\w+)","(?<operation>query|mutation)","(?<sha256Hash>[\w\d]{64})",null\))/g,
 		);
-		S.GraphQLDefinitions = {
-			query: {},
-			mutation: {},
-		};
 		for (const match of matches) {
 			const { name, operation, sha256Hash } = match.groups;
 			S.GraphQLDefinitions[operation][name] = { name, operation, sha256Hash, value: null };
