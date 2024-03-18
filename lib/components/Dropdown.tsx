@@ -31,7 +31,10 @@ const DropdownMenuItem = ({ option, isActive, onSwitch, children }: MenuItemProp
 	);
 };
 
-export type DropdownOptions = Record<string, React.ReactNode>;
+export interface OptionProps {
+	preview?: boolean;
+}
+export type DropdownOptions = Record<string, React.FC<OptionProps>>;
 
 interface DropdownMenuProps<O extends DropdownOptions> {
 	options: O;
@@ -41,46 +44,37 @@ interface DropdownMenuProps<O extends DropdownOptions> {
 export default function <O extends DropdownOptions>({ options, activeOption, onSwitch }: DropdownMenuProps<O>) {
 	const { ContextMenu, Menu, TextComponent } = S.ReactComponents;
 
+	const SelectedOption: React.FC<OptionProps> = options[activeOption];
+
+	if (Object.keys(options).length === 1) {
+		return (
+			<button className="x-sortBox-sortDropdown" type="button" role="combobox" aria-expanded="false">
+				<TextComponent variant="mesto" semanticColor="textSubdued">
+					<SelectedOption preview />
+				</TextComponent>
+			</button>
+		);
+	}
+
 	const DropdownMenu = props => {
 		return (
 			<Menu {...props}>
-				{Object.entries(options).map(([option, children]) => (
+				{Object.entries(options).map(([option, Children]) => (
 					<DropdownMenuItem option={option} isActive={option === activeOption} onSwitch={onSwitch}>
-						{children}
+						<Children />
 					</DropdownMenuItem>
 				))}
 			</Menu>
 		);
 	};
 
-	if (Object.keys(options).length === 1) {
-		return (
-			<button className="x-sortBox-sortDropdown" type="button" role="combobox" aria-expanded="false">
-				<TextComponent variant="mesto" semanticColor="textSubdued">
-					{options[activeOption]}
-				</TextComponent>
-			</button>
-		);
-	}
-
 	return (
 		<ContextMenu menu={<DropdownMenu />} trigger="click">
 			<button className="x-sortBox-sortDropdown" type="button" role="combobox" aria-expanded="false">
 				<TextComponent variant="mesto" semanticColor="textSubdued">
-					{options[activeOption]}
+					<SelectedOption preview />
 				</TextComponent>
-				<svg
-					role="img"
-					height="16"
-					width="16"
-					aria-hidden="true"
-					className="Svg-img-16 Svg-img-16-icon Svg-img-icon Svg-img-icon-small"
-					viewBox="0 0 16 16"
-					data-encore-id="icon"
-					fill="currentColor"
-				>
-					<path d="m14 6-6 6-6-6h12z" />
-				</svg>
+				{createIconComponent({ icon: `<path d="m14 6-6 6-6-6h12z" />` })}
 			</button>
 		</ContextMenu>
 	);
