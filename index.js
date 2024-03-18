@@ -2,6 +2,7 @@ export * from "./src/static.js";
 import { S as _S } from "./src/expose/index.js";
 export const S = _S;
 import { Registrar } from "./src/registers/registers.js";
+import { Subject, BehaviorSubject } from "https://esm.sh/rxjs";
 export const createRegistrar = (mod)=>{
     if (!mod.registrar) {
         mod.registrar = new Registrar(mod.getIdentifier());
@@ -51,33 +52,45 @@ export const createLogger = (mod)=>{
     }
     return mod.logger;
 };
-class Event {
-    getArg;
-    callbacks;
-    constructor(getArg){
-        this.getArg = getArg;
-        this.callbacks = new Array();
-    }
-    on(callback) {
-        callback(this.getArg());
-        this.callbacks.push(callback);
-    }
-    fire() {
-        const arg = this.getArg();
-        for (const callback of this.callbacks)callback(arg);
-    }
-}
 const PlayerAPI = S.Platform.getPlayerAPI();
-const getPlayerState = ()=>PlayerAPI.getState();
-export const Events = {
-    Player: {
-        update: new Event(getPlayerState),
-        songchanged: new Event(getPlayerState)
+const History = S.Platform.getHistory();
+const newEventBus = ()=>{
+    return {
+        Player: {
+            state_updated: new BehaviorSubject(PlayerAPI.getState()),
+            status_changed: new Subject(),
+            song_changed: new Subject()
+        },
+        History: {
+            updated: new BehaviorSubject(History.location)
+        }
+    };
+};
+const EventBus = newEventBus();
+export const createEventBus = (mod)=>{
+    if (!mod.eventBus) {
+        mod.eventBus = newEventBus();
+        // TODO: come up with a nicer solution
+        EventBus.Player.song_changed.subscribe(mod.eventBus.Player.song_changed);
+        EventBus.Player.state_updated.subscribe(mod.eventBus.Player.state_updated);
+        EventBus.Player.status_changed.subscribe(mod.eventBus.Player.status_changed);
+        EventBus.History.updated.subscribe(mod.eventBus.History.updated);
+        const unloadJS = mod.unloadJS;
+        mod.unloadJS = ()=>{
+            mod.eventBus.Player.song_changed.unsubscribe();
+            mod.eventBus.Player.state_updated.unsubscribe();
+            mod.eventBus.Player.status_changed.unsubscribe();
+            mod.eventBus.History.updated.unsubscribe();
+            return unloadJS();
+        };
     }
+    return mod.eventBus;
 };
 let cachedState = {};
 PlayerAPI.getEvents().addListener("update", ({ data: state })=>{
-    if (state?.item?.uri !== cachedState?.item?.uri) Events.Player.songchanged.fire();
-    if (state?.isPaused !== cachedState?.isPaused) Events.Player.update.fire();
+    EventBus.Player.state_updated.next(state);
+    if (state?.item?.uri !== cachedState?.item?.uri) EventBus.Player.song_changed.next(state);
+    if (state?.isPaused !== cachedState?.isPaused || state?.isBuffering !== cachedState?.isBuffering) EventBus.Player.status_changed.next(state);
     cachedState = state;
 });
+History.listen((location)=>EventBus.History.updated.next(location));
