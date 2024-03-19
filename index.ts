@@ -65,7 +65,7 @@ const newEventBus = () => {
 		Player: {
 			state_updated: new BehaviorSubject(PlayerAPI.getState()),
 			status_changed: new Subject<any>(),
-			song_changed: new Subject<any>(),
+			song_changed: new BehaviorSubject(PlayerAPI.getState()),
 		},
 		History: {
 			updated: new BehaviorSubject(History.location),
