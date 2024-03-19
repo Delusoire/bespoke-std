@@ -243,11 +243,13 @@ const exposeReactComponents = (
 			ctaText: findBy("ctaText")(exportedFCs),
 			styledImage: findBy("placeholderSrc")(exportedFCs),
 		},
-		Chip: findBy(m => m.render.toString().includes("invertedDark") && m.render.toString().includes("isUsingKeyboard"))(exportedForwardRefs),
+		Chip: findBy(m => m.render.toString().includes("Chip") && !m.render.toString().includes("ChipClear"))(exportedForwardRefs),
+		ChipClear: findBy(m => m.render.toString().includes("ChipClear"))(exportedForwardRefs),
+		ScrollableContainer: findBy("scrollLeft", "showButtons")(exportedFunctions),
 		Toggle: findBy("onSelected", 'type:"checkbox"')(exportedFCs),
 		Router: findBy("navigationType", "static")(exportedFCs),
-		Routes: findBy(/\([\w$]+\)\{let\{children:[\w$]+,location:[\w$]+\}=[\w$]+/)(exportedFCs),
-		Route: findBy(/^function [\w$]+\([\w$]+\)\{\(0,[\w$]+\.[\w$]+\)\(\!1\)\}$/)(exportedFCs),
+		Routes: findBy(/\([a-zA-Z_\$][\w\$]*\)\{let\{children:[a-zA-Z_\$][\w\$]*,location:[a-zA-Z_\$][\w\$]*\}=[a-zA-Z_\$][\w\$]*/)(exportedFCs),
+		Route: findBy(/^function [a-zA-Z_\$][\w\$]*\([a-zA-Z_\$][\w\$]*\)\{\(0,[a-zA-Z_\$][\w\$]*\.[a-zA-Z_\$][\w\$]*\)\(\!1\)\}$/)(exportedFCs),
 		StoreProvider: findBy("notifyNestedSubs", "serverState")(exportedFCs),
 
 		Cards,
@@ -438,14 +440,16 @@ export function expose({ Snackbar, Platform, React }: { Snackbar: Snackbar; Plat
 		Flipped: exportedFunctions.find(m => (m as any).displayName === "Flipped") as Flipped,
 	};
 
-	const useSnackbar = findBy(/^function\(\)\{return\(0,[\w$]+\.useContext\)\([\w$]+\)\}$/)(exportedFunctions) as useSnackbar;
+	const useSnackbar = findBy(/^function\(\)\{return\(0,[a-zA-Z_\$][\w\$]*\.useContext\)\([a-zA-Z_\$][\w\$]*\)\}$/)(
+		exportedFunctions,
+	) as useSnackbar;
 
 	const _reservedPanelIds = exports.find(m => m.BuddyFeed) as Record<string, number>;
 	const Mousetrap = modules.find(m => m.addKeycodes) as Mousetrap;
 	const Locale = exports.find(m => m.getTranslations);
 	const createUrlLocale = findBy("has", "baseName", "language")(exportedFunctions);
 
-	const imageAnalysis = findBy(/\![\w$]+\.isFallback|\{extractColor/)(exportedFunctions);
+	const imageAnalysis = findBy(/\![a-zA-Z_\$][\w\$]*\.isFallback|\{extractColor/)(exportedFunctions);
 	const fallbackPreset = exports.find(m => m.colorDark);
 	const extractColorPreset = async image => {
 		const analysis = await imageAnalysis(Platform.getGraphQLLoader(), image);
