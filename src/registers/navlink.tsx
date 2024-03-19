@@ -5,33 +5,67 @@ import { createIconComponent } from "../../lib/createIconComponent.js";
 import { registerTransform } from "../../mixin.js";
 
 const registry = new Registry<React.FC, void>(
-	() => refreshNavLinks() || true,
-	() => refreshNavLinks() || true,
+	() => refreshNavLinks?.() || true,
+	() => refreshNavLinks?.() || true,
 );
 export default registry;
 
+let navLinkFactoryCtx: React.Context<React.FC<NavLinkFactoryProps>>;
+
 let refreshNavLinks: React.DispatchWithoutAction | undefined;
-globalThis.__renderNavLinks = () => {
+globalThis.__renderNavLinks = (isTouchscreenUi: boolean) => {
 	const [refreshCount, refresh] = S.React.useReducer(x => x + 1, 0);
 	refreshNavLinks = refresh;
 
-	return S.React.createElement(() => registry.getItems().map(Item => <Item />));
+	const navLinkFactory = isTouchscreenUi ? NavLinkGlobal : NavLinkSidebar;
+
+	if (!navLinkFactoryCtx) navLinkFactoryCtx = S.React.createContext<React.FC<NavLinkFactoryProps> | null>(null);
+
+	return (
+		<navLinkFactoryCtx.Provider value={navLinkFactory}>
+			{registry.getItems().map(NavLink => (
+				<NavLink />
+			))}
+		</navLinkFactoryCtx.Provider>
+	);
 };
 registerTransform({
 	transform: emit => str => {
 		const j = str.search(/\("li",\{[^\{]*\{[^\{]*\{to:"\/search/);
 		const i = findMatchingPos(str, j, 1, ["(", ")"], 1);
 
+		str = `${str.slice(0, i)},__renderNavLinks(false)${str.slice(i)}`;
+
+		str = str.replace(/(,[a-zA-Z_\$][\w\$]*===(?:[a-zA-Z_\$][\w\$]*\.){2}HOME_NEXT_TO_NAVIGATION)/, ",__renderNavLinks(true)$1");
+
 		emit();
-		return `${str.slice(0, i)},__renderNavLinks()${str.slice(i)}`;
+		return str;
 	},
 	glob: /^\/xpui\.js/,
 });
 
 export type NavLinkProps = { localizedApp: string; appRoutePath: string; icon: string; activeIcon: string };
 export const NavLink = ({ localizedApp, appRoutePath, icon, activeIcon }: NavLinkProps) => {
-	const isSidebarCollapsed = S.Platform.getLocalStorageAPI().getItem("ylx-sidebar-state") === 1;
 	const isActive = S.Platform.getHistory().location.pathanme?.startsWith(appRoutePath);
+	const createIcon = () => createIconComponent({ icon: isActive ? activeIcon : icon, iconSize: 24 });
+
+	const NavLinkFactory = S.React.useContext(navLinkFactoryCtx);
+	if (!NavLinkFactory) {
+		return;
+	}
+
+	return <NavLinkFactory localizedApp={localizedApp} appRoutePath={appRoutePath} createIcon={createIcon} isActive={isActive} />;
+};
+
+interface NavLinkFactoryProps {
+	localizedApp: string;
+	appRoutePath: string;
+	createIcon: () => React.ReactNode;
+	isActive: boolean;
+}
+
+export const NavLinkSidebar = ({ localizedApp, appRoutePath, createIcon, isActive }: NavLinkFactoryProps) => {
+	const isSidebarCollapsed = S.Platform.getLocalStorageAPI().getItem("ylx-sidebar-state") === 1;
 
 	return (
 		<li className="main-yourLibraryX-navItem InvalidDropTarget">
@@ -45,10 +79,25 @@ export const NavLink = ({ localizedApp, appRoutePath, icon, activeIcon }: NavLin
 					onClick={() => undefined}
 					aria-label={localizedApp}
 				>
-					{createIconComponent({ icon: isActive ? activeIcon : icon, iconSize: 24 })}
+					{createIcon()}
 					{!isSidebarCollapsed && <S.ReactComponents.Text variant="bodyMediumBold">{localizedApp}</S.ReactComponents.Text>}
 				</S.ReactComponents.Nav>
 			</S.ReactComponents.Tooltip>
 		</li>
+	);
+};
+
+export const NavLinkGlobal = ({ localizedApp, appRoutePath, createIcon, isActive }: NavLinkFactoryProps) => {
+	return (
+		<S.ReactComponents.Tooltip label={localizedApp}>
+			<S.ReactComponents.ButtonTertiary
+				iconOnly={createIcon}
+				className={S.classnames("bWBqSiXEceAj1SnzqusU", "jdlOKroADlFeZZQeTdp8", "cUwQnQoE3OqXqSYLT0hv", {
+					voA9ZoTTlPFyLpckNw3S: isActive,
+				})}
+				aria-label={localizedApp}
+				onClick={() => S.Platform.getHistory().push(appRoutePath)}
+			/>
+		</S.ReactComponents.Tooltip>
 	);
 };

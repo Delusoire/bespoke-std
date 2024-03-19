@@ -236,6 +236,7 @@ export function expose({ Snackbar, Platform, React }) {
     };
     const getPlayContext = findBy("referrerIdentifier", "usePlayContextItem")(exportedFunctions);
     const FilterContext = exportedContexts.find((c)=>c._currentValue2?.setFilter);
+    const InternalPropetyMap = exports.find((o)=>o.Builder);
     return {
         webpack,
         useMatch,
@@ -259,6 +260,7 @@ export function expose({ Snackbar, Platform, React }) {
         createUrlLocale,
         Snackbar,
         URI: exposeURI(webpack),
-        extractColorPreset
+        extractColorPreset,
+        InternalPropetyMap
     };
 }

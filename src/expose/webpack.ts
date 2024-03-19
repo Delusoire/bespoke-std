@@ -465,6 +465,8 @@ export function expose({ Snackbar, Platform, React }: { Snackbar: Snackbar; Plat
 
 	const FilterContext = exportedContexts.find(c => c._currentValue2?.setFilter);
 
+	const InternalPropetyMap = exports.find(o => o.Builder);
+
 	return {
 		webpack,
 		useMatch,
@@ -489,5 +491,6 @@ export function expose({ Snackbar, Platform, React }: { Snackbar: Snackbar; Plat
 		Snackbar,
 		URI: exposeURI(webpack),
 		extractColorPreset,
+		InternalPropetyMap,
 	};
 }
