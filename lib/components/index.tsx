@@ -77,10 +77,6 @@ export const getProp = (obj: any, path: string) => {
 	return obj;
 };
 
-export type Tree<E> = { "": E } & {
-	[key: string]: Tree<E>;
-};
-
 export const useSearchBar = ({ placeholder, expanded }: { placeholder: string; expanded: boolean }) => {
 	const [search, setSearch] = React.useState("");
 	const searchProps = { filter: "", setFilter: (f: string) => setSearch(f) };
@@ -91,7 +87,11 @@ export const useSearchBar = ({ placeholder, expanded }: { placeholder: string; e
 		</S.FilterContext.Provider>
 	);
 
-	return [search, searchbar] as const;
+	return [searchbar, search] as const;
+};
+
+export type Tree<E> = { "": E } & {
+	[key: string]: Tree<E>;
 };
 
 export const useChipFilter = (filters: Tree<React.ReactNode>) => {
