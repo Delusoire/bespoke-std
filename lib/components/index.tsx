@@ -56,7 +56,9 @@ export const useDropdown = <O extends DropdownOptions>({ options, storage, stora
 	let activeOption: keyof typeof options;
 	let setActiveOption: (reducer: (state: keyof typeof options) => keyof typeof options) => void;
 	if (storage && initialStorageVariable) {
-		[activeOption, setActiveOption] = createPersistedState(storage)(`drop-down:${initialStorageVariable}`)<keyof typeof options>(getDefaultOption);
+		[activeOption, setActiveOption] = createPersistedState(storage)(`drop-down:${initialStorageVariable}`)<keyof typeof options>(
+			getDefaultOption,
+		);
 	} else {
 		[activeOption, setActiveOption] = React.useState(getDefaultOption);
 	}
@@ -64,4 +66,53 @@ export const useDropdown = <O extends DropdownOptions>({ options, storage, stora
 	const dropdown = <Dropdown options={options} activeOption={activeOption} onSwitch={o => setActiveOption(() => o)} />;
 
 	return [dropdown, activeOption, setActiveOption] as const;
+};
+
+export const getProp = (obj: any, path: string) => {
+	if (path.startsWith(".")) {
+		return _.get(obj, path.slice(1));
+	}
+	return obj;
+};
+
+export const useChipFilter = filters => {
+	const [selectedFilterFullKey, setSelectedFilterFullKey] = React.useState(".");
+
+	const selectedFilters = React.useMemo(
+		() =>
+			selectedFilterFullKey
+				.split(".")
+				.slice(1, -1)
+				.reduce(
+					(selectedFilters, selectedFilterFullKeyPart) => {
+						const prevSelectedFilter = selectedFilters.at(-1);
+						const selectedFilter = {
+							key: `${prevSelectedFilter.key}${selectedFilterFullKeyPart}.`,
+							filter: prevSelectedFilter.filter[selectedFilterFullKeyPart],
+						};
+						selectedFilters.push(selectedFilter);
+						return selectedFilters;
+					},
+					[{ key: ".", filter: filters }],
+				),
+		[filters, selectedFilterFullKey],
+	);
+
+	const lastSelectedFilter = selectedFilters.at(-1);
+	const availableFilters = [];
+	for (const [k, v] of Object.entries(lastSelectedFilter.filter)) {
+		if (k === "") continue;
+		availableFilters.push({ key: `${lastSelectedFilter.key}${k}.`, filter: v });
+	}
+
+	const exclusiveSelectedFilters = selectedFilters.slice(1);
+
+	const toggleFilter = React.useCallback(
+		filter => setSelectedFilterFullKey(filter.key === selectedFilterFullKey ? "." : filter.key),
+		[selectedFilterFullKey],
+	);
+
+	const chipFilter = <ChipFilter selectedFilters={exclusiveSelectedFilters} availableFilters={availableFilters} toggleFilter={toggleFilter} />;
+
+	return [chipFilter, exclusiveSelectedFilters, selectedFilterFullKey, setSelectedFilterFullKey] as const;
 };
