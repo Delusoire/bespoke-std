@@ -81,6 +81,19 @@ export type Tree<E> = { "": E } & {
 	[key: string]: Tree<E>;
 };
 
+export const useSearchBar = ({ placeholder, expanded }: { placeholder: string; expanded: boolean }) => {
+	const [search, setSearch] = React.useState("");
+	const searchProps = { filter: "", setFilter: (f: string) => setSearch(f) };
+
+	const searchbar = (
+		<S.FilterContext.Provider value={searchProps}>
+			<S.ReactComponents.FilterBox alwaysExpanded={expanded} placeholder={placeholder} />
+		</S.FilterContext.Provider>
+	);
+
+	return [search, searchbar] as const;
+};
+
 export const useChipFilter = (filters: Tree<React.ReactNode>) => {
 	const [selectedFilterFullKey, setSelectedFilterFullKey] = React.useState(".");
 
