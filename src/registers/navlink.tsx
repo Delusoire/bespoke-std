@@ -36,7 +36,7 @@ registerTransform({
 
 		str = `${str.slice(0, i)},__renderNavLinks(false)${str.slice(i)}`;
 
-		str = str.replace(/(,[a-zA-Z_\$][\w\$]*===(?:[a-zA-Z_\$][\w\$]*\.){2}HOME_NEXT_TO_NAVIGATION)/, ",__renderNavLinks(true)$1");
+		str = str.replace(/(,[a-zA-Z_\$][\w\$]*===(?:[a-zA-Z_\$][\w\$]*\.){2}HOME_NEXT_TO_NAVIGATION&&.+?)\]/, "$1,__renderNavLinks(true)]");
 
 		emit();
 		return str;
