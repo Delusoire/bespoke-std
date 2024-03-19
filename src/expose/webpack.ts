@@ -242,6 +242,7 @@ const exposeReactComponents = (
 		},
 		Chip: findBy(m => m.render.toString().includes("Chip") && !m.render.toString().includes("ChipClear"))(exportedForwardRefs),
 		ChipClear: findBy(m => m.render.toString().includes("ChipClear"))(exportedForwardRefs),
+		FilterBox: exportedMemos.find(f => f.type.toString().includes("filterBoxApiRef")),
 		ScrollableContainer: findBy("scrollLeft", "showButtons")(exportedFunctions) as React.FC<any>,
 		ScrollableText: findBy("scrollLeft", "pauseAtEndEdgeDurationMs")(exportedFunctions) as React.FC<any>,
 		Toggle: findBy("onSelected", 'type:"checkbox"')(exportedFCs),
