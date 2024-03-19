@@ -1,6 +1,8 @@
 import { S } from "/modules/Delusoire/stdlib/index.js";
 const { React } = S;
+import { _ } from "/modules/Delusoire/stdlib/deps.js";
 import Dropdown, { type DropdownOptions } from "./Dropdown.js";
+import { ChipFilter } from "./ChipFilter.js";
 
 // * Who doesn't love some Fixed Point (Functional) Programming?
 const Bluebird =
@@ -75,7 +77,11 @@ export const getProp = (obj: any, path: string) => {
 	return obj;
 };
 
-export const useChipFilter = filters => {
+export type Tree<E> = { "": E } & {
+	[key: string]: Tree<E>;
+};
+
+export const useChipFilter = (filters: Tree<React.ReactNode>) => {
 	const [selectedFilterFullKey, setSelectedFilterFullKey] = React.useState(".");
 
 	const selectedFilters = React.useMemo(
@@ -88,7 +94,7 @@ export const useChipFilter = filters => {
 						const prevSelectedFilter = selectedFilters.at(-1);
 						const selectedFilter = {
 							key: `${prevSelectedFilter.key}${selectedFilterFullKeyPart}.`,
-							filter: prevSelectedFilter.filter[selectedFilterFullKeyPart],
+							filter: prevSelectedFilter.filter[selectedFilterFullKeyPart] as F,
 						};
 						selectedFilters.push(selectedFilter);
 						return selectedFilters;

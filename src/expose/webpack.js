@@ -74,8 +74,6 @@ const exposeReactComponents = ({ require, chunks, exports, exportedFunctions, ex
         RemoteConfigProvider: ({ configuration = Platform.getRemoteConfiguration(), children })=>React.createElement(RemoteConfigProviderComponent, {
                 configuration
             }, children),
-        // TODO: better nomenclature
-        Scrollable: findBy("applyLightThemeControls")(exportedFunctions),
         PanelHeader: exportedFCs.find((m)=>m.toString().includes("panel") && m.toString().includes("actions")),
         PanelContent: findBy((m)=>m.render.toString().includes("scrollBarContainer"))(exportedForwardRefs) || findBy("scrollBarContainer")(exportedFCs),
         PanelSkeleton: findBy("label", "aside")(exportedFCs) || findBy((m)=>m.render.toString().includes("section"))(exportedForwardRefs),
@@ -91,6 +89,7 @@ const exposeReactComponents = ({ require, chunks, exports, exportedFunctions, ex
         Chip: findBy((m)=>m.render.toString().includes("Chip") && !m.render.toString().includes("ChipClear"))(exportedForwardRefs),
         ChipClear: findBy((m)=>m.render.toString().includes("ChipClear"))(exportedForwardRefs),
         ScrollableContainer: findBy("scrollLeft", "showButtons")(exportedFunctions),
+        ScrollableText: findBy("scrollLeft", "pauseAtEndEdgeDurationMs")(exportedFunctions),
         Toggle: findBy("onSelected", 'type:"checkbox"')(exportedFCs),
         Router: findBy("navigationType", "static")(exportedFCs),
         Routes: findBy(/\([a-zA-Z_\$][\w\$]*\)\{let\{children:[a-zA-Z_\$][\w\$]*,location:[a-zA-Z_\$][\w\$]*\}=[a-zA-Z_\$][\w\$]*/)(exportedFCs),
