@@ -82,9 +82,9 @@ export const useSearchBar = ({ placeholder, expanded }: { placeholder: string; e
 	const searchProps = { filter: "", setFilter: (f: string) => setSearch(f) };
 
 	const searchbar = (
-		<S.FilterContext.Provider value={searchProps}>
+		<S.SpotifyReactContexts.FilterContext.Provider value={searchProps}>
 			<S.ReactComponents.FilterBox alwaysExpanded={expanded} placeholder={placeholder} />
-		</S.FilterContext.Provider>
+		</S.SpotifyReactContexts.FilterContext.Provider>
 	);
 
 	return [searchbar, search] as const;

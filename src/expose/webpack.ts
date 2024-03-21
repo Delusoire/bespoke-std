@@ -55,7 +55,6 @@ export type useInfiniteQuery = typeof useInfiniteQueryT;
 export type Mousetrap = typeof MousetrapT;
 
 import type { Platform } from "./platform.js";
-import { S } from "./index.js";
 
 type ParsableAsURI = any;
 
@@ -385,18 +384,89 @@ const exposeWebpack = () => {
 	};
 };
 
-// TODO: extract functions
-export function expose({ Snackbar, Platform, React }: { Snackbar: Snackbar; Platform: Platform; React: React }) {
-	const webpack = exposeWebpack();
-	const { require, chunks, modules, exports, exportedFunctions, exportedContexts, exportedForwardRefs, exportedMemos } = webpack;
-
+const exposeReactRouter = ({ require, chunks }: Webpack) => {
 	const [ReactRouterModuleID] = chunks.find(([_, v]) => v.toString().includes("React Router"));
 	const ReactRouterModule = Object.values(require(ReactRouterModuleID));
 
 	// https://github.com/remix-run/react-router/blob/main/packages/react-router/lib/hooks.tsx#L131
 	const useMatch = findBy("let{pathname:", /\(([a-zA-Z_\$][\w\$]*),([a-zA-Z_\$][\w\$]*)\)\),\[\2,\1\]/)(ReactRouterModule);
 
-	const useContextMenuState = findBy("useContextMenuState")(exportedFunctions);
+	return { useMatch };
+};
+
+const exposeReactFlipToolkit = ({ exportedFunctions }: Webpack) => {
+	const Flipper = exportedFunctions.find(m => m.prototype?.getSnapshotBeforeUpdate) as unknown as Flipper;
+	const Flipped = exportedFunctions.find(m => (m as any).displayName === "Flipped") as Flipped;
+
+	return {
+		Flipper,
+		Flipped,
+	};
+};
+
+const exposeReact = ({ modules }: Webpack) => {
+	const ReactJSX = modules.find(m => m.jsx);
+	const ReactDOM = modules.find(m => m.createRoot) as ReactDOM;
+	const ReactDOMServer = modules.find(m => m.renderToString) as ReactDOMServer;
+
+	return { ReactJSX, ReactDOM, ReactDOMServer };
+};
+
+const exposeSpotifyReactHooks = ({ exportedFunctions }: Webpack) => {
+	const DragHandler = findBy("dataTransfer", "data-dragging")(exportedFunctions);
+	const useExtractedColor = exportedFunctions.find(
+		m => m.toString().includes("extracted-color") || (m.toString().includes("colorRaw") && m.toString().includes("useEffect")),
+	);
+	return { DragHandler, useExtractedColor };
+};
+
+const exposeReactQuery = ({ require, chunks, modules, exportedFunctions }: Webpack) => {
+	const [infiniteQueryChunkID] = chunks.find(
+		([_, v]) => v.toString().includes("fetchPreviousPage") && v.toString().includes("getOptimisticResult"),
+	);
+
+	const QueryClient = findBy("defaultMutationOptions")(exportedFunctions) as unknown as QueryClient;
+	const PersistQueryClientProvider = findBy("persistOptions")(exportedFunctions);
+	const QueryClientProvider = findBy("use QueryClientProvider")(exportedFunctions) as QueryClientProvider;
+	const notifyManager = modules.find(m => m.setBatchNotifyFunction) as notifyManager;
+	const useMutation = findBy("mutateAsync")(exportedFunctions) as useMutation;
+	const useQuery = findBy(
+		/^function [a-zA-Z_\$][\w\$]*\(([a-zA-Z_\$][\w\$]*),([a-zA-Z_\$][\w\$]*)\)\{return\(0,[a-zA-Z_\$][\w\$]*\.[a-zA-Z_\$][\w\$]*\)\(\1,[a-zA-Z_\$][\w\$]*\.[a-zA-Z_\$][\w\$]*,\2\)\}$/,
+	)(exportedFunctions) as useQuery;
+	const useQueryClient = findBy("client", "Provider", "mount")(exportedFunctions) as useQueryClient;
+	const useSuspenseQuery = findBy("throwOnError", "suspense", "enabled")(exportedFunctions) as useSuspenseQuery;
+	const useInfiniteQuery = Object.values(require(infiniteQueryChunkID)).find(m => typeof m === "function") as useInfiniteQuery;
+
+	return {
+		QueryClient,
+		PersistQueryClientProvider,
+		QueryClientProvider,
+		notifyManager,
+		useMutation,
+		useQuery,
+		useQueryClient,
+		useSuspenseQuery,
+		useInfiniteQuery,
+	};
+};
+
+const exposeClassnames = ({ require, chunks }: Webpack) => {
+	const [classnamesModuleID] = chunks.find(([_, v]) => v.toString().includes("[native code]") && !v.toString().includes("<anonymous>"));
+	const classnames = require(classnamesModuleID) as classNames;
+
+	return { classnames };
+};
+
+const exposeMousetrap = ({ modules }: Webpack) => {
+	const Mousetrap = modules.find(m => m.addKeycodes) as Mousetrap;
+
+	return { Mousetrap };
+};
+
+const exposeSnackbar = ({ exportedFunctions }: Webpack) => {
+	const useSnackbar = findBy(/^function\(\)\{return\(0,[a-zA-Z_\$][\w\$]*\.useContext\)\([a-zA-Z_\$][\w\$]*\)\}$/)(
+		exportedFunctions,
+	) as useSnackbar;
 
 	type FN_enqueueCustomSnackbar_OPTS = (Omit<OptionsObject, "key"> & { keyPrefix: string }) | (OptionsObject & { identifier: string });
 	const enqueueCustomSnackbar = findBy("enqueueCustomSnackbar", "headless")(exportedFunctions) as (
@@ -404,50 +474,25 @@ export function expose({ Snackbar, Platform, React }: { Snackbar: Snackbar; Plat
 		opts: FN_enqueueCustomSnackbar_OPTS,
 	) => ReturnType<EnqueueSnackbar>;
 
-	const ReactJSX = modules.find(m => m.jsx);
-	const ReactDOM = modules.find(m => m.createRoot) as ReactDOM;
-	const ReactDOMServer = modules.find(m => m.renderToString) as ReactDOMServer;
+	return { useSnackbar, enqueueCustomSnackbar };
+};
+
+const exposeSpotifyReactContexts = ({ exportedContexts }: Webpack) => {
+	const FilterContext = exportedContexts.find(c => c._currentValue2?.setFilter);
+
+	return { FilterContext };
+};
+
+// TODO: extract functions
+export function expose({ Snackbar, Platform, React }: { Snackbar: Snackbar; Platform: Platform; React: React }) {
+	const webpack = exposeWebpack();
+	const { exports, exportedFunctions } = webpack;
+
+	const useContextMenuState = findBy("useContextMenuState")(exportedFunctions);
+
 	const Color = Object.assign(findBy("static fromHex")(exportedFunctions), { CSSFormat: exports.find(m => m.RGBA) });
 
-	const [classnamesModuleID] = chunks.find(([_, v]) => v.toString().includes("[native code]") && !v.toString().includes("<anonymous>"));
-	const classnames = require(classnamesModuleID) as classNames;
-
-	const ReactHooks = {
-		DragHandler: findBy("dataTransfer", "data-dragging")(exportedFunctions),
-		useExtractedColor: exportedFunctions.find(
-			m => m.toString().includes("extracted-color") || (m.toString().includes("colorRaw") && m.toString().includes("useEffect")),
-		),
-	};
-
-	const [infiniteQueryChunkID] = chunks.find(
-		([_, v]) => v.toString().includes("fetchPreviousPage") && v.toString().includes("getOptimisticResult"),
-	);
-
-	const ReactQuery = {
-		PersistQueryClientProvider: findBy("persistOptions")(exportedFunctions),
-		QueryClient: findBy("defaultMutationOptions")(exportedFunctions) as unknown as QueryClient,
-		QueryClientProvider: findBy("use QueryClientProvider")(exportedFunctions) as QueryClientProvider,
-		notifyManager: modules.find(m => m.setBatchNotifyFunction) as notifyManager,
-		useMutation: findBy("mutateAsync")(exportedFunctions) as useMutation,
-		useQuery: findBy(
-			/^function [a-zA-Z_\$][\w\$]*\(([a-zA-Z_\$][\w\$]*),([a-zA-Z_\$][\w\$]*)\)\{return\(0,[a-zA-Z_\$][\w\$]*\.[a-zA-Z_\$][\w\$]*\)\(\1,[a-zA-Z_\$][\w\$]*\.[a-zA-Z_\$][\w\$]*,\2\)\}$/,
-		)(exportedFunctions) as useQuery,
-		useQueryClient: findBy("client", "Provider", "mount")(exportedFunctions) as useQueryClient,
-		useSuspenseQuery: findBy("throwOnError", "suspense", "enabled")(exportedFunctions) as useSuspenseQuery,
-		useInfiniteQuery: Object.values(require(infiniteQueryChunkID)).find(m => typeof m === "function") as useInfiniteQuery,
-	};
-
-	const ReactFlipToolkit = {
-		Flipper: exportedFunctions.find(m => m.prototype?.getSnapshotBeforeUpdate) as unknown as Flipper,
-		Flipped: exportedFunctions.find(m => (m as any).displayName === "Flipped") as Flipped,
-	};
-
-	const useSnackbar = findBy(/^function\(\)\{return\(0,[a-zA-Z_\$][\w\$]*\.useContext\)\([a-zA-Z_\$][\w\$]*\)\}$/)(
-		exportedFunctions,
-	) as useSnackbar;
-
 	const _reservedPanelIds = exports.find(m => m.BuddyFeed) as Record<string, number>;
-	const Mousetrap = modules.find(m => m.addKeycodes) as Mousetrap;
 	const Locale = exports.find(m => m.getTranslations);
 	const createUrlLocale = findBy("has", "baseName", "language")(exportedFunctions);
 
@@ -466,32 +511,27 @@ export function expose({ Snackbar, Platform, React }: { Snackbar: Snackbar; Plat
 
 	const getPlayContext = findBy("referrerIdentifier", "usePlayContextItem")(exportedFunctions);
 
-	const FilterContext = exportedContexts.find(c => c._currentValue2?.setFilter);
-
 	const InternalPropetyMap = exports.find(o => o.Builder);
 
 	return {
 		webpack,
-		useMatch,
+		ReactRouter: exposeReactRouter(webpack),
+		...exposeReact(webpack),
+		ReactFlipToolkit: exposeReactFlipToolkit(webpack),
 		getPlayContext,
-		FilterContext,
 		useContextMenuState,
-		enqueueCustomSnackbar,
-		ReactJSX,
-		ReactDOM,
-		ReactDOMServer,
-		classnames,
+		...exposeClassnames(webpack),
 		Color,
 		ReactComponents: exposeReactComponents(webpack, React, Platform),
-		ReactHooks,
-		ReactQuery,
-		ReactFlipToolkit,
-		useSnackbar,
+		SpotifyReactHooks: exposeSpotifyReactHooks(webpack),
+		SpotifyReactContexts: exposeSpotifyReactContexts(webpack),
+		ReactQuery: exposeReactQuery(webpack),
+		...exposeSnackbar(webpack),
 		_reservedPanelIds,
-		Mousetrap,
+		...exposeMousetrap(webpack),
 		Locale,
 		createUrlLocale,
-		Snackbar,
+		Snackbar: Object.assign(Snackbar, exposeSnackbar(webpack)),
 		URI: exposeURI(webpack),
 		extractColorPreset,
 		InternalPropetyMap,
