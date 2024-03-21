@@ -2,7 +2,7 @@ import { capitalize } from "../../deps.js";
 import { findBy } from "/hooks/util.js";
 import { S } from "./index.js";
 // ! Clean this file
-const exposeReactComponents = ({ require, chunks, exports, exportedFunctions, exportedMemos, exportedForwardRefs }, React, Platform)=>{
+const exposeReactComponents = ({ require, chunks, modules, exports, exportedFunctions, exportedMemos, exportedForwardRefs }, React, Platform)=>{
     const exportedFCs = exportedFunctions;
     const Menus = Object.fromEntries(exportedMemos.flatMap((m)=>{
         const str = m.type.toString();
@@ -53,6 +53,7 @@ const exposeReactComponents = ({ require, chunks, exports, exportedFunctions, ex
     const exportedMemoFRefs = exportedMemos.filter((m)=>m.type.$$typeof === Symbol.for("react.forward_ref"));
     const Nav = exportedMemoFRefs.find((m)=>m.type.render.toString().includes("navigationalRoot"));
     const NavTo = exportedMemoFRefs.find((m)=>m.type.render.toString().includes("pageId"));
+    const { InstrumentedRedirect } = modules.find((e)=>e.InstrumentedRedirect);
     return {
         SnackbarProvider: findBy("enqueueSnackbar called with invalid argument")(exportedFunctions),
         SettingColumn: findBy("setSectionFilterMatchQueryValue", "filterMatchQuery")(exportedFCs),
@@ -102,7 +103,8 @@ const exposeReactComponents = ({ require, chunks, exports, exportedFunctions, ex
         GenericModal: findBy("GenericModal")(exportedFCs),
         Tracklist: exportedMemos.find((f)=>f.type.toString().includes("nrValidItems")),
         TracklistRow: exportedMemos.find((f)=>f.type.toString().includes("track-icon")),
-        TracklistColumnsContextProvider: findBy("columnType")(exportedFunctions)
+        TracklistColumnsContextProvider: findBy("columnType")(exportedFunctions),
+        InstrumentedRedirect
     };
 };
 const exposeURI = ({ require, chunks })=>{

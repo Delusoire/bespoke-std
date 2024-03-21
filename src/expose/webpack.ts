@@ -140,7 +140,7 @@ export type ExposedWebpack = ReturnType<typeof expose>;
 // ! Clean this file
 
 const exposeReactComponents = (
-	{ require, chunks, exports, exportedFunctions, exportedMemos, exportedForwardRefs }: Webpack,
+	{ require, chunks, modules, exports, exportedFunctions, exportedMemos, exportedForwardRefs }: Webpack,
 	React: React,
 	Platform: Platform,
 ) => {
@@ -196,6 +196,8 @@ const exposeReactComponents = (
 	const exportedMemoFRefs = exportedMemos.filter(m => m.type.$$typeof === Symbol.for("react.forward_ref"));
 	const Nav = exportedMemoFRefs.find(m => m.type.render.toString().includes("navigationalRoot"));
 	const NavTo = exportedMemoFRefs.find(m => m.type.render.toString().includes("pageId"));
+
+	const { InstrumentedRedirect } = modules.find(e => e.InstrumentedRedirect);
 
 	return {
 		SnackbarProvider: findBy("enqueueSnackbar called with invalid argument")(exportedFunctions) as unknown as SnackbarProvider,
@@ -259,6 +261,7 @@ const exposeReactComponents = (
 		Tracklist: exportedMemos.find(f => f.type.toString().includes("nrValidItems")),
 		TracklistRow: exportedMemos.find(f => f.type.toString().includes("track-icon")),
 		TracklistColumnsContextProvider: findBy("columnType")(exportedFunctions),
+		InstrumentedRedirect,
 	};
 };
 
