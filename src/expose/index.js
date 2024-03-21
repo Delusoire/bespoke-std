@@ -1,5 +1,26 @@
 import { registerTransform } from "../../mixin.js";
 export const S = {};
+S.GraphQLDefinitions = {
+    query: {},
+    mutation: {}
+};
+registerTransform({
+    transform: (emit)=>(str)=>{
+            const matches = str.matchAll(/(=new [a-zA-Z_\$][\w\$]*\.[a-zA-Z_\$][\w\$]*\("(?<name>\w+)","(?<operation>query|mutation)","(?<sha256Hash>[\w\d]{64})",null\))/g);
+            for (const match of matches){
+                const { name, operation, sha256Hash } = match.groups;
+                S.GraphQLDefinitions[operation][name] = {
+                    name,
+                    operation,
+                    sha256Hash,
+                    value: null
+                };
+            }
+            emit();
+            return str;
+        },
+    glob: /.+\.js$/
+});
 registerTransform({
     transform: (emit)=>(str)=>{
             str = str.replace(/([a-zA-Z_\$][\w\$]*\.prototype\.setState=)/, "__React=t;$1");
@@ -23,6 +44,19 @@ registerTransform({
         },
     then: (Tippy)=>{
         S.Tippy = Tippy;
+    },
+    glob: /^\/vendor~xpui\.js/
+});
+registerTransform({
+    transform: (emit)=>(str)=>{
+            str = str.replace(/([a-zA-Z_\$][\w\$]*)=((?:function|\()([\w$.,{}()= ]+(?:springConfig|overshootClamping)){2})/, "$1=__ReactFlipToolkitSpring=$2");
+            Object.defineProperty(globalThis, "__ReactFlipToolkitSpring", {
+                set: emit
+            });
+            return str;
+        },
+    then: (ReactFlipToolkitSpring)=>{
+        S.ReactFlipToolkitSpring = ReactFlipToolkitSpring;
     },
     glob: /^\/vendor~xpui\.js/
 });
@@ -70,10 +104,11 @@ registerTransform({
         },
     then: async (Snackbar)=>{
         const { expose } = await import("./webpack.js");
-        const { Platform } = S;
+        const { Platform, React } = S;
         Object.assign(S, expose({
             Snackbar,
-            Platform
+            Platform,
+            React
         }));
     },
     glob: /^\/vendor~xpui\.js/
@@ -92,40 +127,6 @@ registerTransform({
     },
     glob: /^\/xpui\.js/,
     noAwait: true
-});
-registerTransform({
-    transform: (emit)=>(str)=>{
-            str = str.replace(/([a-zA-Z_\$][\w\$]*)=((?:function|\()([\w$.,{}()= ]+(?:springConfig|overshootClamping)){2})/, "$1=__ReactFlipToolkitSpring=$2");
-            Object.defineProperty(globalThis, "__ReactFlipToolkitSpring", {
-                set: emit
-            });
-            return str;
-        },
-    then: (ReactFlipToolkitSpring)=>{
-        S.ReactFlipToolkitSpring = ReactFlipToolkitSpring;
-    },
-    glob: /^\/vendor~xpui\.js/
-});
-S.GraphQLDefinitions = {
-    query: {},
-    mutation: {}
-};
-registerTransform({
-    transform: (emit)=>(str)=>{
-            const matches = str.matchAll(/(=new [a-zA-Z_\$][\w\$]*\.[a-zA-Z_\$][\w\$]*\("(?<name>\w+)","(?<operation>query|mutation)","(?<sha256Hash>[\w\d]{64})",null\))/g);
-            for (const match of matches){
-                const { name, operation, sha256Hash } = match.groups;
-                S.GraphQLDefinitions[operation][name] = {
-                    name,
-                    operation,
-                    sha256Hash,
-                    value: null
-                };
-            }
-            emit();
-            return str;
-        },
-    glob: /.+\.js$/
 });
 registerTransform({
     transform: (emit)=>(str)=>{
