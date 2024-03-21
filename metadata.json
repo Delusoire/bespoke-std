@@ -8,7 +8,6 @@
 	"readme": "./assets/README.md",
 	"entries": {
 		"js": "index.js",
-		"css": false,
 		"mixin": "mixin.js"
 	},
 	"dependencies": []
