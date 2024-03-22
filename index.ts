@@ -106,7 +106,7 @@ const listener = ({ data: state }) => {
 };
 PlayerAPI.getEvents().addListener("update", listener);
 
-const cancel = History.listen(location => loaded && EventBus.History.updated.next(location));
+const cancel = History.listen(location => EventBus.History.updated.next(location));
 
 export default function () {
 	return () => {
