@@ -9,6 +9,7 @@ export const createRegistrar = (mod)=>{
         const unloadJS = mod.unloadJS;
         mod.unloadJS = ()=>{
             mod.registrar.dispose();
+            mod.registrar = undefined;
             return unloadJS();
         };
     }
@@ -81,6 +82,7 @@ export const createEventBus = (mod)=>{
             mod.eventBus.Player.state_updated.unsubscribe();
             mod.eventBus.Player.status_changed.unsubscribe();
             mod.eventBus.History.updated.unsubscribe();
+            mod.eventBus = undefined;
             return unloadJS();
         };
     }

@@ -32,6 +32,5 @@ export class Registrar {
 	dispose() {
 		for (const [item, type] of this.ledger.entries()) this.unregister(type, item);
 		this.ledger.clear();
-		this.ledger = undefined;
 	}
 }
