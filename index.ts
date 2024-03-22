@@ -6,7 +6,7 @@ export const S = _S;
 import type { Module } from "/hooks/module.js";
 
 import { Registrar } from "./src/registers/registers.js";
-import { Subject, BehaviorSubject } from "https://esm.sh/rxjs";
+import { Subject, BehaviorSubject, Subscription } from "https://esm.sh/rxjs";
 
 export const createRegistrar = (mod: Module & { registrar?: Registrar }) => {
 	if (!mod.registrar) {
@@ -81,16 +81,14 @@ export const createEventBus = (mod: Module & { eventBus?: EventBus }) => {
 	if (!mod.eventBus) {
 		mod.eventBus = newEventBus();
 		// TODO: come up with a nicer solution
-		EventBus.Player.song_changed.subscribe(mod.eventBus.Player.song_changed);
-		EventBus.Player.state_updated.subscribe(mod.eventBus.Player.state_updated);
-		EventBus.Player.status_changed.subscribe(mod.eventBus.Player.status_changed);
-		EventBus.History.updated.subscribe(mod.eventBus.History.updated);
+		const s = new Subscription();
+		s.add(EventBus.Player.song_changed.subscribe(mod.eventBus.Player.song_changed));
+		s.add(EventBus.Player.state_updated.subscribe(mod.eventBus.Player.state_updated));
+		s.add(EventBus.Player.status_changed.subscribe(mod.eventBus.Player.status_changed));
+		s.add(EventBus.History.updated.subscribe(mod.eventBus.History.updated));
 		const unloadJS = mod.unloadJS;
 		mod.unloadJS = () => {
-			mod.eventBus.Player.song_changed.unsubscribe();
-			mod.eventBus.Player.state_updated.unsubscribe();
-			mod.eventBus.Player.status_changed.unsubscribe();
-			mod.eventBus.History.updated.unsubscribe();
+			s.unsubscribe();
 			mod.eventBus = undefined;
 			return unloadJS();
 		};
