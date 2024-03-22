@@ -98,11 +98,19 @@ export const createEventBus = (mod: Module & { eventBus?: EventBus }) => {
 };
 
 let cachedState = {};
-PlayerAPI.getEvents().addListener("update", ({ data: state }) => {
+const listener = ({ data: state }) => {
 	EventBus.Player.state_updated.next(state);
 	if (state?.item?.uri !== cachedState?.item?.uri) EventBus.Player.song_changed.next(state);
 	if (state?.isPaused !== cachedState?.isPaused || state?.isBuffering !== cachedState?.isBuffering) EventBus.Player.status_changed.next(state);
 	cachedState = state;
-});
+};
+PlayerAPI.getEvents().addListener("update", listener);
 
-History.listen(location => EventBus.History.updated.next(location));
+const cancel = History.listen(location => loaded && EventBus.History.updated.next(location));
+
+export default function () {
+	return () => {
+		PlayerAPI.getEvents().removeListener("update", listener);
+		cancel();
+	};
+}
