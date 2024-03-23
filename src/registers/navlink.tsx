@@ -56,7 +56,7 @@ registerTransform({
 
 export type NavLinkProps = { localizedApp: string; appRoutePath: string; icon: string; activeIcon: string };
 export const NavLink = ({ localizedApp, appRoutePath, icon, activeIcon }: NavLinkProps) => {
-	const isActive = S.Platform.getHistory().location.pathanme?.startsWith(appRoutePath);
+	const isActive = S.Platform.getHistory().location.pathname?.startsWith(appRoutePath);
 	const createIcon = () => createIconComponent({ icon: isActive ? activeIcon : icon, iconSize: 24 });
 
 	const NavLinkFactory = S.React.useContext(navLinkFactoryCtx);

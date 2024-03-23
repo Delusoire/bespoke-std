@@ -2,7 +2,7 @@ import { S } from "../src/expose/index.js";
 
 export const createIconComponent = ({
 	icon,
-	realIconSize = 16,
+	realIconSize,
 	iconSize = 16,
 	...props
 }: { [k: string]: any; icon: string; realIconSize?: number; iconSize?: number }) => {

@@ -42,7 +42,7 @@ registerTransform({
     glob: /^\/xpui\.js/
 });
 export const NavLink = ({ localizedApp, appRoutePath, icon, activeIcon })=>{
-    const isActive = S.Platform.getHistory().location.pathanme?.startsWith(appRoutePath);
+    const isActive = S.Platform.getHistory().location.pathname?.startsWith(appRoutePath);
     const createIcon = ()=>createIconComponent({
             icon: isActive ? activeIcon : icon,
             iconSize: 24
