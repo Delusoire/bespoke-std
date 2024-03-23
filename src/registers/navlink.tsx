@@ -3,6 +3,7 @@ import { S } from "../expose/index.js";
 import { findMatchingPos } from "/hooks/util.js";
 import { createIconComponent } from "../../lib/createIconComponent.js";
 import { registerTransform } from "../../mixin.js";
+import { SVGIcons } from "../static.js";
 
 const registry = new (class extends Registry<React.FC, void> {
 	register(item: React.FC, predicate: Predicate<void>): React.FC {
@@ -27,16 +28,28 @@ globalThis.__renderNavLinks = (isTouchscreenUi: boolean) =>
 		const [refreshCount, refresh] = S.React.useReducer(x => x + 1, 0);
 		refreshNavLinks = refresh;
 
+		if (!S.ReactComponents) {
+			return;
+		}
+
 		const navLinkFactory = isTouchscreenUi ? NavLinkGlobal : NavLinkSidebar;
 
 		if (!navLinkFactoryCtx) navLinkFactoryCtx = S.React.createContext<React.FC<NavLinkFactoryProps> | null>(null);
 
-		return (
+		const children = (
 			<navLinkFactoryCtx.Provider value={navLinkFactory}>
 				{registry.getItems().map(NavLink => (
-					<NavLink />
+					<div className="inline-flex">
+						<NavLink />
+					</div>
 				))}
 			</navLinkFactoryCtx.Provider>
+		);
+
+		return isTouchscreenUi ? (
+			<S.ReactComponents.ScrollableContainer className="custom-navlinks-scrollable_container">{children}</S.ReactComponents.ScrollableContainer>
+		) : (
+			children
 		);
 	});
 registerTransform({
@@ -108,3 +121,33 @@ export const NavLinkGlobal = ({ localizedApp, appRoutePath, createIcon, isActive
 		</S.ReactComponents.Tooltip>
 	);
 };
+
+//! remove in next build
+registry.register(
+	() => <NavLink icon={SVGIcons.x} activeIcon={SVGIcons.x} appRoutePath="/test/1/" localizedApp="Test 1" />,
+	() => true,
+);
+registry.register(
+	() => <NavLink icon={SVGIcons.x} activeIcon={SVGIcons.x} appRoutePath="/test/2/" localizedApp="Test 2" />,
+	() => true,
+);
+registry.register(
+	() => <NavLink icon={SVGIcons.x} activeIcon={SVGIcons.x} appRoutePath="/test/3/" localizedApp="Test 3" />,
+	() => true,
+);
+registry.register(
+	() => <NavLink icon={SVGIcons.x} activeIcon={SVGIcons.x} appRoutePath="/test/4/" localizedApp="Test 4" />,
+	() => true,
+);
+registry.register(
+	() => <NavLink icon={SVGIcons.x} activeIcon={SVGIcons.x} appRoutePath="/test/5/" localizedApp="Test 5" />,
+	() => true,
+);
+registry.register(
+	() => <NavLink icon={SVGIcons.x} activeIcon={SVGIcons.x} appRoutePath="/test/6/" localizedApp="Test 6" />,
+	() => true,
+);
+registry.register(
+	() => <NavLink icon={SVGIcons.x} activeIcon={SVGIcons.x} appRoutePath="/test/7/" localizedApp="Test 7" />,
+	() => true,
+);
