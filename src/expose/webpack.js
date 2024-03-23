@@ -1,7 +1,21 @@
 import { capitalize } from "../../deps.js";
 import { findBy } from "/hooks/util.js";
 // ! Clean this file
-const exposeReactComponents = ({ require, chunks, modules, exports, exportedFunctions, exportedMemos, exportedForwardRefs }, React, Platform)=>{
+const exposeReactComponentsUI = ({ exports, exportedFunctions, exportedForwardRefs })=>{
+    const componentNames = Object.keys(exports.find((e)=>e.BrowserDefaultFocusStyleProvider));
+    return Object.fromEntries([
+        exportedFunctions.map((f)=>[
+                componentNames.find((n)=>f.toString().match(new RegExp(`"data-encore-id":(?:[a-zA-Z_\$][\w\$]*\\.){2}${n}\\b`))),
+                f
+            ]).filter(([_])=>_),
+        exportedForwardRefs.map((f)=>[
+                componentNames.find((n)=>f.render.toString().match(new RegExp(`"data-encore-id":(?:[a-zA-Z_\$][\w\$]*\\.){2}${n}\\b`))),
+                f
+            ]).filter(([_])=>_)
+    ].flat());
+};
+const exposeReactComponents = (webpack, React, Platform)=>{
+    const { require, chunks, modules, exports, exportedFunctions, exportedMemos, exportedForwardRefs } = webpack;
     const exportedFCs = exportedFunctions;
     const Menus = Object.fromEntries(exportedMemos.flatMap((m)=>{
         const str = m.type.toString();
@@ -54,13 +68,11 @@ const exposeReactComponents = ({ require, chunks, modules, exports, exportedFunc
     const NavTo = exportedMemoFRefs.find((m)=>m.type.render.toString().includes("pageId"));
     const { InstrumentedRedirect } = modules.find((e)=>e.InstrumentedRedirect);
     return {
+        UI: exposeReactComponentsUI(webpack),
         SnackbarProvider: findBy("enqueueSnackbar called with invalid argument")(exportedFunctions),
         SettingColumn: findBy("setSectionFilterMatchQueryValue", "filterMatchQuery")(exportedFCs),
         SettingText: findBy("textSubdued", "dangerouslySetInnerHTML")(exportedFCs),
         SettingToggle: findBy("condensed", "onSelected")(exportedFCs),
-        IconComponent: findBy("$iconColor", 'role:"img"')(exportedFCs),
-        Text: exportedForwardRefs.find((m)=>m.render.toString().includes("paddingBottom") && m.render.toString().includes("className")),
-        TextComponent: exports.find((m)=>m.h1 && m.render),
         ContextMenu: Object.values(require(ContextMenuModuleID))[0],
         RightClickMenu: findBy("action", "open", "trigger", "right-click")(exportedFCs),
         ConfirmDialog: findBy("isOpen", "shouldCloseOnEsc", "onClose")(exportedFCs),
@@ -77,17 +89,12 @@ const exposeReactComponents = ({ require, chunks, modules, exports, exportedFunc
         PanelHeader: exportedFCs.find((m)=>m.toString().includes("panel") && m.toString().includes("actions")),
         PanelContent: findBy((m)=>m.render.toString().includes("scrollBarContainer"))(exportedForwardRefs) || findBy("scrollBarContainer")(exportedFCs),
         PanelSkeleton: findBy("label", "aside")(exportedFCs) || findBy((m)=>m.render.toString().includes("section"))(exportedForwardRefs),
-        ButtonPrimary: findBy((m)=>m.displayName === "ButtonPrimary")(exportedForwardRefs),
-        ButtonSecondary: findBy((m)=>m.displayName === "ButtonSecondary")(exportedForwardRefs),
-        ButtonTertiary: findBy((m)=>m.displayName === "ButtonTertiary")(exportedForwardRefs),
         Snackbar: {
             wrapper: findBy("encore-light-theme", "elevated")(exportedFCs),
             simpleLayout: findBy("leading", "center", "trailing")(exportedFCs),
             ctaText: findBy("ctaText")(exportedFCs),
             styledImage: findBy("placeholderSrc")(exportedFCs)
         },
-        Chip: findBy((m)=>m.render.toString().includes("Chip") && !m.render.toString().includes("ChipClear"))(exportedForwardRefs),
-        ChipClear: findBy((m)=>m.render.toString().includes("ChipClear"))(exportedForwardRefs),
         FilterBox: exportedMemos.find((f)=>f.type.toString().includes("filterBoxApiRef")),
         ScrollableContainer: findBy("scrollLeft", "showButtons")(exportedFunctions),
         ScrollableText: findBy("scrollLeft", "pauseAtEndEdgeDurationMs")(exportedFunctions),

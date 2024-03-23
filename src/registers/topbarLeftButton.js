@@ -41,7 +41,7 @@ export const Button = (props)=>{
 };
 const TopbarLeftButtonRound = ({ label, disabled = false, onClick, icon })=>/*#__PURE__*/ S.React.createElement(S.ReactComponents.Tooltip, {
         label: label
-    }, /*#__PURE__*/ S.React.createElement(S.ReactComponents.ButtonTertiary, {
+    }, /*#__PURE__*/ S.React.createElement(S.ReactComponents.UI.ButtonTertiary, {
         size: "medium",
         iconOnly: ()=>icon && createIconComponent({
                 icon,

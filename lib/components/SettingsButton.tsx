@@ -15,11 +15,9 @@ interface SettingsButtonProps {
 }
 
 export default function ({ section }: SettingsButtonProps): React.ReactElement<HTMLButtonElement> {
-	const { Tooltip, ButtonTertiary } = S.ReactComponents;
-
 	return (
-		<Tooltip label="Settings" renderInline={true} placement="top">
-			<ButtonTertiary
+		<S.ReactComponents.Tooltip label="Settings" renderInline={true} placement="top">
+			<S.ReactComponents.UI.ButtonTertiary
 				buttonSize="sm"
 				onClick={async () => {
 					History.push("/preferences");
@@ -38,6 +36,6 @@ export default function ({ section }: SettingsButtonProps): React.ReactElement<H
 				aria-label="Settings"
 				iconOnly={SettingsIcon}
 			/>
-		</Tooltip>
+		</S.ReactComponents.Tooltip>
 	);
 }

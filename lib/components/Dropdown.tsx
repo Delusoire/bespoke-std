@@ -42,40 +42,38 @@ interface DropdownMenuProps<O extends DropdownOptions> {
 	onSwitch: (option: keyof O) => void;
 }
 export default function <O extends DropdownOptions>({ options, activeOption, onSwitch }: DropdownMenuProps<O>) {
-	const { ContextMenu, Menu, TextComponent } = S.ReactComponents;
-
 	const SelectedOption: React.FC<OptionProps> = options[activeOption];
 
 	if (Object.keys(options).length === 1) {
 		return (
 			<button className="x-sortBox-sortDropdown" type="button" role="combobox" aria-expanded="false">
-				<TextComponent variant="mesto" semanticColor="textSubdued">
+				<S.ReactComponents.UI.Type variant="mesto" semanticColor="textSubdued">
 					<SelectedOption preview />
-				</TextComponent>
+				</S.ReactComponents.UI.Type>
 			</button>
 		);
 	}
 
 	const DropdownMenu = props => {
 		return (
-			<Menu {...props}>
+			<S.ReactComponents.Menu {...props}>
 				{Object.entries(options).map(([option, Children]) => (
 					<DropdownMenuItem option={option} isActive={option === activeOption} onSwitch={onSwitch}>
 						<Children />
 					</DropdownMenuItem>
 				))}
-			</Menu>
+			</S.ReactComponents.Menu>
 		);
 	};
 
 	return (
-		<ContextMenu menu={<DropdownMenu />} trigger="click">
+		<S.ReactComponents.ContextMenu menu={<DropdownMenu />} trigger="click">
 			<button className="x-sortBox-sortDropdown" type="button" role="combobox" aria-expanded="false">
-				<TextComponent variant="mesto" semanticColor="textSubdued">
+				<S.ReactComponents.UI.Type variant="mesto" semanticColor="textSubdued">
 					<SelectedOption preview />
-				</TextComponent>
+				</S.ReactComponents.UI.Type>
 				{createIconComponent({ icon: `<path d="m14 6-6 6-6-6h12z" />` })}
 			</button>
-		</ContextMenu>
+		</S.ReactComponents.ContextMenu>
 	);
 }

@@ -3,7 +3,6 @@ import { S } from "../src/expose/index.js";
 type Task<A> = (() => Awaited<A>) | (() => Promise<Awaited<A>>);
 
 const { React } = S;
-const { ButtonSecondary } = S.ReactComponents;
 
 type OmitType<A> = Omit<A, "type">;
 
@@ -154,9 +153,9 @@ export class Settings<A = Record<string, never>> {
 
 	ButtonField = (field: ButtonField) => (
 		<this.SettingField field={field}>
-			<ButtonSecondary id={field.id} buttonSize="sm" onClick={field.onClick} className="x-settings-button">
+			<S.ReactComponents.UI.ButtonSecondary id={field.id} buttonSize="sm" onClick={field.onClick} className="x-settings-button">
 				{field.text}
-			</ButtonSecondary>
+			</S.ReactComponents.UI.ButtonSecondary>
 		</this.SettingField>
 	);
 

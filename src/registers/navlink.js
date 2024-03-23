@@ -71,14 +71,14 @@ export const NavLinkSidebar = ({ localizedApp, appRoutePath, createIcon, isActiv
         }),
         onClick: ()=>undefined,
         "aria-label": localizedApp
-    }, createIcon(), !isSidebarCollapsed && /*#__PURE__*/ S.React.createElement(S.ReactComponents.Text, {
+    }, createIcon(), !isSidebarCollapsed && /*#__PURE__*/ S.React.createElement(S.ReactComponents.UI.Text, {
         variant: "bodyMediumBold"
     }, localizedApp))));
 };
 export const NavLinkGlobal = ({ localizedApp, appRoutePath, createIcon, isActive })=>{
     return /*#__PURE__*/ S.React.createElement(S.ReactComponents.Tooltip, {
         label: localizedApp
-    }, /*#__PURE__*/ S.React.createElement(S.ReactComponents.ButtonTertiary, {
+    }, /*#__PURE__*/ S.React.createElement(S.ReactComponents.UI.ButtonTertiary, {
         iconOnly: createIcon,
         className: S.classnames("bWBqSiXEceAj1SnzqusU", "jdlOKroADlFeZZQeTdp8", "cUwQnQoE3OqXqSYLT0hv", {
             voA9ZoTTlPFyLpckNw3S: isActive

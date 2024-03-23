@@ -15,7 +15,7 @@ registerTransform({
 });
 export const NowPlayingWidget = ({ label, icon, onClick })=>/*#__PURE__*/ S.React.createElement(S.ReactComponents.Tooltip, {
         label: label
-    }, /*#__PURE__*/ S.React.createElement(S.ReactComponents.ButtonTertiary, {
+    }, /*#__PURE__*/ S.React.createElement(S.ReactComponents.UI.ButtonTertiary, {
         size: "small",
         className: undefined,
         "aria-label": label,

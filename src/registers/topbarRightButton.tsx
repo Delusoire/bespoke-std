@@ -56,9 +56,9 @@ export const Button = (props: TopbarRightButtonProps) => {
 
 const TopbarRightButtonRound = ({ label, disabled = false, onClick, icon }: TopbarRightButtonProps) => {
 	<S.ReactComponents.Tooltip label={label}>
-		<S.ReactComponents.ButtonTertiary aria-label={label} onClick={onClick} size="small" condensedAll className="OomFKn3bsxs5JfNUoWhz">
+		<S.ReactComponents.UI.ButtonTertiary aria-label={label} onClick={onClick} size="small" condensedAll className="OomFKn3bsxs5JfNUoWhz">
 			{icon && createIconComponent({ icon, realIconSize: 24, iconSize: 16 })}
-		</S.ReactComponents.ButtonTertiary>
+		</S.ReactComponents.UI.ButtonTertiary>
 	</S.ReactComponents.Tooltip>;
 };
 

@@ -42,7 +42,7 @@ export const Button = (props)=>{
 const TopbarRightButtonRound = ({ label, disabled = false, onClick, icon })=>{
     /*#__PURE__*/ S.React.createElement(S.ReactComponents.Tooltip, {
         label: label
-    }, /*#__PURE__*/ S.React.createElement(S.ReactComponents.ButtonTertiary, {
+    }, /*#__PURE__*/ S.React.createElement(S.ReactComponents.UI.ButtonTertiary, {
         "aria-label": label,
         onClick: onClick,
         size: "small",

@@ -1,7 +1,8 @@
 import { S } from "../src/expose/index.js";
 
 const { Locale } = S;
-const { GenericModal, Text } = S.ReactComponents;
+const { GenericModal } = S.ReactComponents;
+const { Text } = S.ReactComponents.UI;
 
 import RootRegistry from "../src/registers/root.js";
 import { createIconComponent } from "./createIconComponent.js";

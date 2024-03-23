@@ -36,7 +36,7 @@ export const PlaybarBarControl = ({
 
 	return (
 		<S.ReactComponents.Tooltip label={label}>
-			<S.ReactComponents.ButtonTertiary
+			<S.ReactComponents.UI.ButtonTertiary
 				aria-label={label}
 				size="small"
 				className={`main-genericButton-button ${_isActive || isActiveNoIndicator ? "main-genericButton-buttonActive" : ""} ${

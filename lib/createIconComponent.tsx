@@ -7,7 +7,7 @@ export const createIconComponent = ({
 	...props
 }: { [k: string]: any; icon: string; realIconSize?: number; iconSize?: number }) => {
 	return (
-		<S.ReactComponents.IconComponent
+		<S.ReactComponents.UI.Icon
 			autoMirror={false}
 			iconSize={realIconSize ?? iconSize}
 			viewBox={`0 0 ${iconSize} ${iconSize}`}

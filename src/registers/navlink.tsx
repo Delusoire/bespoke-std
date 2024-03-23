@@ -87,7 +87,7 @@ export const NavLinkSidebar = ({ localizedApp, appRoutePath, createIcon, isActiv
 					aria-label={localizedApp}
 				>
 					{createIcon()}
-					{!isSidebarCollapsed && <S.ReactComponents.Text variant="bodyMediumBold">{localizedApp}</S.ReactComponents.Text>}
+					{!isSidebarCollapsed && <S.ReactComponents.UI.Text variant="bodyMediumBold">{localizedApp}</S.ReactComponents.UI.Text>}
 				</S.ReactComponents.Nav>
 			</S.ReactComponents.Tooltip>
 		</li>
@@ -97,7 +97,7 @@ export const NavLinkSidebar = ({ localizedApp, appRoutePath, createIcon, isActiv
 export const NavLinkGlobal = ({ localizedApp, appRoutePath, createIcon, isActive }: NavLinkFactoryProps) => {
 	return (
 		<S.ReactComponents.Tooltip label={localizedApp}>
-			<S.ReactComponents.ButtonTertiary
+			<S.ReactComponents.UI.ButtonTertiary
 				iconOnly={createIcon}
 				className={S.classnames("bWBqSiXEceAj1SnzqusU", "jdlOKroADlFeZZQeTdp8", "cUwQnQoE3OqXqSYLT0hv", {
 					voA9ZoTTlPFyLpckNw3S: isActive,

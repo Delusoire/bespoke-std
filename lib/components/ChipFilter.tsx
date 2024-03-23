@@ -17,7 +17,7 @@ export interface ChipFilterProps {
 }
 export const ChipFilter = React.memo(({ availableFilters, selectedFilters, toggleFilter, className }: ChipFilterProps) => {
 	const createChip = isSelected => (filter, index) => (
-		<S.ReactComponents.Chip
+		<S.ReactComponents.UI.Chip
 			onClick={() => toggleFilter(filter)}
 			selectedColorSet="invertedLight"
 			selected={isSelected}
@@ -28,7 +28,7 @@ export const ChipFilter = React.memo(({ availableFilters, selectedFilters, toggl
 			key={filter.key}
 		>
 			{filter.filter[""]}
-		</S.ReactComponents.Chip>
+		</S.ReactComponents.UI.Chip>
 	);
 
 	return (

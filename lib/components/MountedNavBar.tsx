@@ -4,9 +4,9 @@ const { ReactDOM } = S;
 
 const NavToChip = ({ to, title, selected, onClick }) => (
 	<S.ReactComponents.NavTo replace={true} to={to} tabIndex={-1} onClick={onClick} className="ZWI7JsjzJaR_G8Hy4W6J">
-		<S.ReactComponents.Chip selected={selected} selectedColorSet="invertedLight" tabIndex={-1}>
+		<S.ReactComponents.UI.Chip selected={selected} selectedColorSet="invertedLight" tabIndex={-1}>
 			{title}
-		</S.ReactComponents.Chip>
+		</S.ReactComponents.UI.Chip>
 	</S.ReactComponents.NavTo>
 );
 

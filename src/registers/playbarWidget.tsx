@@ -19,7 +19,7 @@ registerTransform({
 export type NowPlayingWidgetProps = { label: string; icon?: string; onClick: () => void };
 export const NowPlayingWidget = ({ label, icon, onClick }: NowPlayingWidgetProps) => (
 	<S.ReactComponents.Tooltip label={label}>
-		<S.ReactComponents.ButtonTertiary
+		<S.ReactComponents.UI.ButtonTertiary
 			size="small"
 			className={undefined}
 			aria-label={label}

@@ -17,7 +17,7 @@ export const PlaybarBarControl = ({ label, isActive = false, isActiveNoIndicator
     const [_isActive, _setIsActive] = S.React.useState(isActive);
     return /*#__PURE__*/ S.React.createElement(S.ReactComponents.Tooltip, {
         label: label
-    }, /*#__PURE__*/ S.React.createElement(S.ReactComponents.ButtonTertiary, {
+    }, /*#__PURE__*/ S.React.createElement(S.ReactComponents.UI.ButtonTertiary, {
         "aria-label": label,
         size: "small",
         className: `KAZD28usA1vPz5GVpm63 ${_isActive || isActiveNoIndicator ? "RK45o6dbvO1mb0wQtSwq" : ""} ${_isActive ? "EHxL6K_6WWDlTCZP6x5w" : ""}`,
