@@ -3,16 +3,21 @@ import { findBy } from "/hooks/util.js";
 // ! Clean this file
 const exposeReactComponentsUI = ({ exports, exportedFunctions, exportedForwardRefs })=>{
     const componentNames = Object.keys(exports.find((e)=>e.BrowserDefaultFocusStyleProvider));
-    return Object.fromEntries([
+    const componentRegexes = componentNames.map((n)=>new RegExp(`"data-encore-id":(?:[a-zA-Z_\$][\w\$]*\\.){2}${n}\\b`));
+    const componentPairs = [
         exportedFunctions.map((f)=>[
-                componentNames.find((n)=>f.toString().match(new RegExp(`"data-encore-id":(?:[a-zA-Z_\$][\w\$]*\\.){2}${n}\\b`))),
+                f,
                 f
-            ]).filter(([_])=>_),
+            ]),
         exportedForwardRefs.map((f)=>[
-                componentNames.find((n)=>f.render.toString().match(new RegExp(`"data-encore-id":(?:[a-zA-Z_\$][\w\$]*\\.){2}${n}\\b`))),
+                f.render,
                 f
-            ]).filter(([_])=>_)
-    ].flat());
+            ])
+    ].flat().map(([s, f])=>[
+            componentNames.find((n, i)=>s.toString().match(componentRegexes[i])),
+            f
+        ]);
+    return Object.fromEntries(componentPairs);
 };
 const exposeReactComponents = (webpack, React, Platform)=>{
     const { require, chunks, modules, exports, exportedFunctions, exportedMemos, exportedForwardRefs } = webpack;
