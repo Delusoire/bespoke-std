@@ -58,7 +58,7 @@ const TopbarLeftButtonRound = ({ label, disabled = false, onClick, icon }: Topba
 	<S.ReactComponents.Tooltip label={label}>
 		<S.ReactComponents.UI.ButtonTertiary
 			size="medium"
-			iconOnly={() => icon && createIconComponent({ icon, realIconSize: 24, iconSize: 16 })}
+			iconOnly={() => icon && createIconComponent({ icon, iconSize: 16, realIconSize: 24 })}
 			condensed
 			aria-label={label}
 			disabled={disabled}

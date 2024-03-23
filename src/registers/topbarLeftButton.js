@@ -45,8 +45,8 @@ const TopbarLeftButtonRound = ({ label, disabled = false, onClick, icon })=>/*#_
         size: "medium",
         iconOnly: ()=>icon && createIconComponent({
                 icon,
-                realIconSize: 24,
-                iconSize: 16
+                iconSize: 16,
+                realIconSize: 24
             }),
         condensed: true,
         "aria-label": label,

@@ -50,8 +50,8 @@ const TopbarRightButtonRound = ({ label, disabled = false, onClick, icon })=>{
         className: "OomFKn3bsxs5JfNUoWhz"
     }, icon && createIconComponent({
         icon,
-        realIconSize: 24,
-        iconSize: 16
+        iconSize: 16,
+        realIconSize: 24
     })));
 };
 const TopbarRightButtonSquare = ({ label, disabled = false, onClick, icon })=>/*#__PURE__*/ S.React.createElement(S.ReactComponents.Tooltip, {
