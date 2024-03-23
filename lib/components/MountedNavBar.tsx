@@ -1,4 +1,5 @@
 import { S } from "../../index.js";
+import { isTouchscreenUi } from "../../src/utils/index.js";
 const { ReactDOM } = S;
 
 const NavToChip = ({ to, title, selected, onClick }) => (
@@ -30,8 +31,7 @@ const NavBar = ({ categories, selectedCategory }: NavBarProps) => (
 );
 
 const TopBarMounted = ({ children }) => {
-	const { enableGlobalNavBar } = S.Platform.getLocalStorageAPI().getItem("remote-config-overrides");
-	const isTouchscreenUi = enableGlobalNavBar === "home-next-to-navigation" || enableGlobalNavBar === "home-next-to-search";
+	const touchscreenUi = isTouchscreenUi();
 
 	const component = (
 		<div className="main-topbar-topbarContent" style={{ pointerEvents: "all" }}>
@@ -39,7 +39,7 @@ const TopBarMounted = ({ children }) => {
 		</div>
 	);
 
-	return isTouchscreenUi ? component : ReactDOM.createPortal(component, document.querySelector(".main-topBar-topbarContentWrapper"));
+	return touchscreenUi ? component : ReactDOM.createPortal(component, document.querySelector(".main-topBar-topbarContentWrapper"));
 };
 
 export const TopNavBar = (props: NavBarProps) => (

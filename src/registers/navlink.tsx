@@ -1,34 +1,44 @@
-import { Registry } from "./registry.js";
+import { type Predicate, Registry } from "./registry.js";
 import { S } from "../expose/index.js";
 import { findMatchingPos } from "/hooks/util.js";
 import { createIconComponent } from "../../lib/createIconComponent.js";
 import { registerTransform } from "../../mixin.js";
 
-const registry = new Registry<React.FC, void>(
-	() => refreshNavLinks?.() || true,
-	() => refreshNavLinks?.() || true,
-);
+const registry = new (class extends Registry<React.FC, void> {
+	register(item: React.FC, predicate: Predicate<void>): React.FC {
+		super.register(item, predicate);
+		refreshNavLinks?.();
+		return item;
+	}
+
+	unregister(item: React.FC): React.FC {
+		super.unregister(item);
+		refreshNavLinks?.();
+		return item;
+	}
+})();
 export default registry;
 
-let navLinkFactoryCtx: React.Context<React.FC<NavLinkFactoryProps>>;
-
 let refreshNavLinks: React.DispatchWithoutAction | undefined;
-globalThis.__renderNavLinks = (isTouchscreenUi: boolean) => {
-	const [refreshCount, refresh] = S.React.useReducer(x => x + 1, 0);
-	refreshNavLinks = refresh;
 
-	const navLinkFactory = isTouchscreenUi ? NavLinkGlobal : NavLinkSidebar;
+let navLinkFactoryCtx: React.Context<React.FC<NavLinkFactoryProps>>;
+globalThis.__renderNavLinks = (isTouchscreenUi: boolean) =>
+	S.React.createElement(() => {
+		const [refreshCount, refresh] = S.React.useReducer(x => x + 1, 0);
+		refreshNavLinks = refresh;
 
-	if (!navLinkFactoryCtx) navLinkFactoryCtx = S.React.createContext<React.FC<NavLinkFactoryProps> | null>(null);
+		const navLinkFactory = isTouchscreenUi ? NavLinkGlobal : NavLinkSidebar;
 
-	return (
-		<navLinkFactoryCtx.Provider value={navLinkFactory}>
-			{registry.getItems().map(NavLink => (
-				<NavLink />
-			))}
-		</navLinkFactoryCtx.Provider>
-	);
-};
+		if (!navLinkFactoryCtx) navLinkFactoryCtx = S.React.createContext<React.FC<NavLinkFactoryProps> | null>(null);
+
+		return (
+			<navLinkFactoryCtx.Provider value={navLinkFactory}>
+				{registry.getItems().map(NavLink => (
+					<NavLink />
+				))}
+			</navLinkFactoryCtx.Provider>
+		);
+	});
 registerTransform({
 	transform: emit => str => {
 		const j = str.search(/\("li",\{[^\{]*\{[^\{]*\{to:"\/search/);
@@ -50,11 +60,8 @@ export const NavLink = ({ localizedApp, appRoutePath, icon, activeIcon }: NavLin
 	const createIcon = () => createIconComponent({ icon: isActive ? activeIcon : icon, iconSize: 24 });
 
 	const NavLinkFactory = S.React.useContext(navLinkFactoryCtx);
-	if (!NavLinkFactory) {
-		return;
-	}
 
-	return <NavLinkFactory localizedApp={localizedApp} appRoutePath={appRoutePath} createIcon={createIcon} isActive={isActive} />;
+	return NavLinkFactory && <NavLinkFactory localizedApp={localizedApp} appRoutePath={appRoutePath} createIcon={createIcon} isActive={isActive} />;
 };
 
 interface NavLinkFactoryProps {

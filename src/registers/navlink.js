@@ -3,19 +3,30 @@ import { S } from "../expose/index.js";
 import { findMatchingPos } from "/hooks/util.js";
 import { createIconComponent } from "../../lib/createIconComponent.js";
 import { registerTransform } from "../../mixin.js";
-const registry = new Registry(()=>refreshNavLinks?.() || true, ()=>refreshNavLinks?.() || true);
+const registry = new class extends Registry {
+    register(item, predicate) {
+        super.register(item, predicate);
+        refreshNavLinks?.();
+        return item;
+    }
+    unregister(item) {
+        super.unregister(item);
+        refreshNavLinks?.();
+        return item;
+    }
+}();
 export default registry;
-let navLinkFactoryCtx;
 let refreshNavLinks;
-globalThis.__renderNavLinks = (isTouchscreenUi)=>{
-    const [refreshCount, refresh] = S.React.useReducer((x)=>x + 1, 0);
-    refreshNavLinks = refresh;
-    const navLinkFactory = isTouchscreenUi ? NavLinkGlobal : NavLinkSidebar;
-    if (!navLinkFactoryCtx) navLinkFactoryCtx = S.React.createContext(null);
-    return /*#__PURE__*/ S.React.createElement(navLinkFactoryCtx.Provider, {
-        value: navLinkFactory
-    }, registry.getItems().map((NavLink)=>/*#__PURE__*/ S.React.createElement(NavLink, null)));
-};
+let navLinkFactoryCtx;
+globalThis.__renderNavLinks = (isTouchscreenUi)=>S.React.createElement(()=>{
+        const [refreshCount, refresh] = S.React.useReducer((x)=>x + 1, 0);
+        refreshNavLinks = refresh;
+        const navLinkFactory = isTouchscreenUi ? NavLinkGlobal : NavLinkSidebar;
+        if (!navLinkFactoryCtx) navLinkFactoryCtx = S.React.createContext(null);
+        return /*#__PURE__*/ S.React.createElement(navLinkFactoryCtx.Provider, {
+            value: navLinkFactory
+        }, registry.getItems().map((NavLink)=>/*#__PURE__*/ S.React.createElement(NavLink, null)));
+    });
 registerTransform({
     transform: (emit)=>(str)=>{
             const j = str.search(/\("li",\{[^\{]*\{[^\{]*\{to:"\/search/);
@@ -37,10 +48,7 @@ export const NavLink = ({ localizedApp, appRoutePath, icon, activeIcon })=>{
             iconSize: 24
         });
     const NavLinkFactory = S.React.useContext(navLinkFactoryCtx);
-    if (!NavLinkFactory) {
-        return;
-    }
-    return /*#__PURE__*/ S.React.createElement(NavLinkFactory, {
+    return NavLinkFactory && /*#__PURE__*/ S.React.createElement(NavLinkFactory, {
         localizedApp: localizedApp,
         appRoutePath: appRoutePath,
         createIcon: createIcon,

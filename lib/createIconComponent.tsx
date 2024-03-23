@@ -1,10 +1,15 @@
 import { S } from "../src/expose/index.js";
 
-export const createIconComponent = ({ icon, iconSize = 16, ...props }: { [k: string]: any; icon: string; iconSize?: number }) => {
+export const createIconComponent = ({
+	icon,
+	realIconSize = 16,
+	iconSize = 16,
+	...props
+}: { [k: string]: any; icon: string; realIconSize?: number; iconSize?: number }) => {
 	return (
 		<S.ReactComponents.IconComponent
 			autoMirror={false}
-			iconSize={iconSize}
+			iconSize={realIconSize ?? iconSize}
 			viewBox={`0 0 ${iconSize} ${iconSize}`}
 			dangerouslySetInnerHTML={{ __html: icon }}
 			{...props}

@@ -1,4 +1,4 @@
-import { REACT_FIBER, waitForElement } from "../util.js";
+import { REACT_FIBER, waitForElement } from "../utils.js";
 import { createIconComponent } from "../createIconComponent.js";
 import { S } from "../../index.js";
 
@@ -14,7 +14,7 @@ interface SettingsButtonProps {
 	section: string;
 }
 
-export default function  ({ section }: SettingsButtonProps): React.ReactElement<HTMLButtonElement> {
+export default function ({ section }: SettingsButtonProps): React.ReactElement<HTMLButtonElement> {
 	const { Tooltip, ButtonTertiary } = S.ReactComponents;
 
 	return (
@@ -40,4 +40,4 @@ export default function  ({ section }: SettingsButtonProps): React.ReactElement<
 			/>
 		</Tooltip>
 	);
-};
+}

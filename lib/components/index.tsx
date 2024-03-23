@@ -107,7 +107,7 @@ export const useChipFilter = (filters: Tree<React.ReactNode>) => {
 						const prevSelectedFilter = selectedFilters.at(-1);
 						const selectedFilter = {
 							key: `${prevSelectedFilter.key}${selectedFilterFullKeyPart}.`,
-							filter: prevSelectedFilter.filter[selectedFilterFullKeyPart] as F,
+							filter: prevSelectedFilter.filter[selectedFilterFullKeyPart] as Tree<React.ReactNode>,
 						};
 						selectedFilters.push(selectedFilter);
 						return selectedFilters;
@@ -124,14 +124,16 @@ export const useChipFilter = (filters: Tree<React.ReactNode>) => {
 		availableFilters.push({ key: `${lastSelectedFilter.key}${k}.`, filter: v });
 	}
 
-	const exclusiveSelectedFilters = selectedFilters.slice(1);
-
 	const toggleFilter = React.useCallback(
 		filter => setSelectedFilterFullKey(filter.key === selectedFilterFullKey ? "." : filter.key),
 		[selectedFilterFullKey],
 	);
 
-	const chipFilter = <ChipFilter selectedFilters={exclusiveSelectedFilters} availableFilters={availableFilters} toggleFilter={toggleFilter} />;
+	const hasFC = ({ filter }: { filter: Tree<React.ReactNode> }) => filter[""];
 
-	return [chipFilter, exclusiveSelectedFilters, selectedFilterFullKey, setSelectedFilterFullKey] as const;
+	const chipFilter = (
+		<ChipFilter selectedFilters={selectedFilters.filter(hasFC)} availableFilters={availableFilters.filter(hasFC)} toggleFilter={toggleFilter} />
+	);
+
+	return [chipFilter, selectedFilters, selectedFilterFullKey, setSelectedFilterFullKey] as const;
 };

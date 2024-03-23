@@ -1,56 +1,77 @@
 import { type Predicate, Registry } from "./registry.js";
 import { S } from "../expose/index.js";
 import { createIconComponent } from "../../lib/createIconComponent.js";
-import type { ReactElement, SetStateAction } from "react";
-import { matchLast } from "/hooks/util.js";
 import { registerTransform } from "../../mixin.js";
+import { isTouchscreenUi } from "../utils/index.js";
 
-class R extends Registry<React.ReactElement, void> {
-	register(item: ReactElement, predicate: Predicate<void>): ReactElement {
+const registry = new (class extends Registry<React.FC, void> {
+	register(item: React.FC, predicate: Predicate<void>): React.FC {
 		super.register(item, predicate);
-		refreshNavButtons.then(refresh => refresh());
+		refreshTopbarLeftButtons?.();
 		return item;
 	}
 
-	unregister(item: ReactElement): ReactElement {
+	unregister(item: React.FC): React.FC {
 		super.unregister(item);
-		refreshNavButtons.then(f => f());
+		refreshTopbarLeftButtons?.();
 		return item;
 	}
-}
-
-const registry = new R();
+})();
 export default registry;
 
-let resolveRefreshNavButtons = undefined;
-const refreshNavButtons = new Promise<() => void>(r => {
-	resolveRefreshNavButtons = r;
-});
+let refreshTopbarLeftButtons: React.DispatchWithoutAction | undefined;
 
-globalThis.__renderTopbarLeftButtons = registry.getItems.bind(registry);
-registerTransform<React.Dispatch<SetStateAction<number>>>({
+let topbarLeftButtonFactoryCtx: React.Context<React.FC<TopbarLeftButtonProps>>;
+globalThis.__renderTopbarLeftButtons = () =>
+	S.React.createElement(() => {
+		const [refreshCount, refresh] = S.React.useReducer(x => x + 1, 0);
+		refreshTopbarLeftButtons = refresh;
+
+		const topbarLeftButtonFactory = isTouchscreenUi() ? TopbarLeftButtonRound : TopbarLeftButtonSquare;
+
+		if (!topbarLeftButtonFactoryCtx) topbarLeftButtonFactoryCtx = S.React.createContext<React.FC<TopbarLeftButtonProps> | null>(null);
+
+		return (
+			<topbarLeftButtonFactoryCtx.Provider value={topbarLeftButtonFactory}>
+				{registry.getItems().map(TopbarLeftButton => (
+					<TopbarLeftButton />
+				))}
+			</topbarLeftButtonFactoryCtx.Provider>
+		);
+	});
+registerTransform({
 	transform: emit => str => {
-		str = str.replace(/("top-bar-forward-button"[^\]]*)/g, "$1,...__renderTopbarLeftButtons()");
-
-		const croppedInput = str.match(/.*"top-bar-back-button"/)![0];
-		const react = matchLast(croppedInput, /([a-zA-Z_\$][\w\$]*)\.useCallback/g)[1];
-		str = str.replace(/(hitUiNavigateForwardInHistory.*?)(return)/, `$1const[rand,setRand]=${react}.useState(0);__setNavButtonsRand=setRand;$2`);
-		Object.defineProperty(globalThis, "__setNavButtonsRand", {
-			set: emit,
-		});
+		str = str.replace(/("top-bar-forward-button"[^\]]*)/g, "$1,__renderTopbarLeftButtons()");
+		emit();
 		return str;
-	},
-	then: setNavButtonsRand => {
-		resolveRefreshNavButtons(() => setNavButtonsRand(Math.random()));
 	},
 	glob: /^\/xpui\.js/,
 });
 
-type ButtonProps = { label: string; disabled?: boolean; onClick: () => void; icon?: string };
-export const Button = ({ label, disabled = false, onClick, icon }: ButtonProps) => (
+type TopbarLeftButtonProps = { label: string; disabled?: boolean; onClick: () => void; icon?: string };
+export const Button = (props: TopbarLeftButtonProps) => {
+	const TopbarLeftButtonFactory = S.React.useContext(topbarLeftButtonFactoryCtx);
+	return TopbarLeftButtonFactory && <TopbarLeftButtonFactory {...props} />;
+};
+
+const TopbarLeftButtonRound = ({ label, disabled = false, onClick, icon }: TopbarLeftButtonProps) => (
 	<S.ReactComponents.Tooltip label={label}>
-		<button aria-label={label} disabled={disabled} className="main-topBar-button" onClick={onClick}>
-			{icon && createIconComponent({ icon, className: "main-topBar-icon" })}
+		<S.ReactComponents.ButtonTertiary
+			size="medium"
+			iconOnly={() => icon && createIconComponent({ icon, realIconSize: 24, iconSize: 16 })}
+			condensed
+			aria-label={label}
+			disabled={disabled}
+			onClick={onClick}
+			className="rBX1EWVZ2EaPwP4y1Gkd"
+		/>
+	</S.ReactComponents.Tooltip>
+);
+
+const TopbarLeftButtonSquare = ({ label, disabled = false, onClick, icon }: TopbarLeftButtonProps) => (
+	<S.ReactComponents.Tooltip label={label}>
+		<button aria-label={label} disabled={disabled} className="ql0zZd7giPXSnPg75NR0" onClick={onClick}>
+			{icon && createIconComponent({ icon, iconSize: 16, className: "main-topBar-icon" })}
 		</button>
 	</S.ReactComponents.Tooltip>
 );
