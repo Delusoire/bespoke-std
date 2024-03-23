@@ -29,9 +29,9 @@ globalThis.__renderNavLinks = (isTouchscreenUi)=>S.React.createElement(()=>{
         if (!navLinkFactoryCtx) navLinkFactoryCtx = S.React.createContext(null);
         const children = /*#__PURE__*/ S.React.createElement(navLinkFactoryCtx.Provider, {
             value: navLinkFactory
-        }, registry.getItems().map((NavLink)=>/*#__PURE__*/ S.React.createElement("div", {
+        }, registry.getItems().map((NavLink)=>isTouchscreenUi ? /*#__PURE__*/ S.React.createElement("div", {
                 className: "inline-flex"
-            }, /*#__PURE__*/ S.React.createElement(NavLink, null))));
+            }, /*#__PURE__*/ S.React.createElement(NavLink, null)) : /*#__PURE__*/ S.React.createElement(NavLink, null)));
         return isTouchscreenUi ? /*#__PURE__*/ S.React.createElement(S.ReactComponents.ScrollableContainer, {
             className: "custom-navlinks-scrollable_container"
         }, children) : children;

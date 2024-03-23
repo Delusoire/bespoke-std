@@ -38,11 +38,15 @@ globalThis.__renderNavLinks = (isTouchscreenUi: boolean) =>
 
 		const children = (
 			<navLinkFactoryCtx.Provider value={navLinkFactory}>
-				{registry.getItems().map(NavLink => (
-					<div className="inline-flex">
+				{registry.getItems().map(NavLink =>
+					isTouchscreenUi ? (
+						<div className="inline-flex">
+							<NavLink />
+						</div>
+					) : (
 						<NavLink />
-					</div>
-				))}
+					),
+				)}
 			</navLinkFactoryCtx.Provider>
 		);
 
