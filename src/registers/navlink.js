@@ -3,7 +3,6 @@ import { S } from "../expose/index.js";
 import { findMatchingPos } from "/hooks/util.js";
 import { createIconComponent } from "../../lib/createIconComponent.js";
 import { registerTransform } from "../../mixin.js";
-import { SVGIcons } from "../static.js";
 const registry = new class extends Registry {
     register(item, predicate) {
         super.register(item, predicate);
@@ -29,9 +28,7 @@ globalThis.__renderNavLinks = (isTouchscreenUi)=>S.React.createElement(()=>{
         if (!navLinkFactoryCtx) navLinkFactoryCtx = S.React.createContext(null);
         const children = /*#__PURE__*/ S.React.createElement(navLinkFactoryCtx.Provider, {
             value: navLinkFactory
-        }, registry.getItems().map((NavLink)=>/*#__PURE__*/ S.React.createElement("div", {
-                className: "inline-flex"
-            }, /*#__PURE__*/ S.React.createElement(NavLink, null))));
+        }, registry.getItems().map((NavLink)=>/*#__PURE__*/ S.React.createElement(NavLink, null)));
         return isTouchscreenUi ? /*#__PURE__*/ S.React.createElement(S.ReactComponents.ScrollableContainer, {
             className: "custom-navlinks-scrollable_container"
         }, children) : children;
@@ -45,6 +42,7 @@ registerTransform({
             ], 1);
             str = `${str.slice(0, i)},__renderNavLinks(false)${str.slice(i)}`;
             str = str.replace(/(,[a-zA-Z_\$][\w\$]*===(?:[a-zA-Z_\$][\w\$]*\.){2}HOME_NEXT_TO_NAVIGATION&&.+?)\]/, "$1,__renderNavLinks(true)]");
+            str = str.replace(/(\["\/","\/home\/")/, '$1,"/bespoke/*"');
             emit();
             return str;
         },
@@ -85,7 +83,9 @@ export const NavLinkSidebar = ({ localizedApp, appRoutePath, createIcon, isActiv
     }, localizedApp))));
 };
 export const NavLinkGlobal = ({ localizedApp, appRoutePath, createIcon, isActive })=>{
-    return /*#__PURE__*/ S.React.createElement(S.ReactComponents.Tooltip, {
+    return /*#__PURE__*/ S.React.createElement("div", {
+        className: "inline-flex"
+    }, /*#__PURE__*/ S.React.createElement(S.ReactComponents.Tooltip, {
         label: localizedApp
     }, /*#__PURE__*/ S.React.createElement(S.ReactComponents.UI.ButtonTertiary, {
         iconOnly: createIcon,
@@ -94,48 +94,5 @@ export const NavLinkGlobal = ({ localizedApp, appRoutePath, createIcon, isActive
         }),
         "aria-label": localizedApp,
         onClick: ()=>S.Platform.getHistory().push(appRoutePath)
-    }));
+    })));
 };
-//! remove in next build
-registry.register(()=>/*#__PURE__*/ S.React.createElement(NavLink, {
-        icon: SVGIcons.x,
-        activeIcon: SVGIcons.x,
-        appRoutePath: "/test/1/",
-        localizedApp: "Test 1"
-    }), ()=>true);
-registry.register(()=>/*#__PURE__*/ S.React.createElement(NavLink, {
-        icon: SVGIcons.x,
-        activeIcon: SVGIcons.x,
-        appRoutePath: "/test/2/",
-        localizedApp: "Test 2"
-    }), ()=>true);
-registry.register(()=>/*#__PURE__*/ S.React.createElement(NavLink, {
-        icon: SVGIcons.x,
-        activeIcon: SVGIcons.x,
-        appRoutePath: "/test/3/",
-        localizedApp: "Test 3"
-    }), ()=>true);
-registry.register(()=>/*#__PURE__*/ S.React.createElement(NavLink, {
-        icon: SVGIcons.x,
-        activeIcon: SVGIcons.x,
-        appRoutePath: "/test/4/",
-        localizedApp: "Test 4"
-    }), ()=>true);
-registry.register(()=>/*#__PURE__*/ S.React.createElement(NavLink, {
-        icon: SVGIcons.x,
-        activeIcon: SVGIcons.x,
-        appRoutePath: "/test/5/",
-        localizedApp: "Test 5"
-    }), ()=>true);
-registry.register(()=>/*#__PURE__*/ S.React.createElement(NavLink, {
-        icon: SVGIcons.x,
-        activeIcon: SVGIcons.x,
-        appRoutePath: "/test/6/",
-        localizedApp: "Test 6"
-    }), ()=>true);
-registry.register(()=>/*#__PURE__*/ S.React.createElement(NavLink, {
-        icon: SVGIcons.x,
-        activeIcon: SVGIcons.x,
-        appRoutePath: "/test/7/",
-        localizedApp: "Test 7"
-    }), ()=>true);
