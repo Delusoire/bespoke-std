@@ -113,7 +113,7 @@ export const NavLinkGlobal = ({ localizedApp, appRoutePath, createIcon, isActive
 			<S.ReactComponents.Tooltip label={localizedApp}>
 				<S.ReactComponents.UI.ButtonTertiary
 					iconOnly={createIcon}
-					className={S.classnames("bWBqSiXEceAj1SnzqusU", "jdlOKroADlFeZZQeTdp8", "cUwQnQoE3OqXqSYLT0hv", {
+					className={S.classnames("bWBqSiXEceAj1SnzqusU", "jdlOKroADlFeZZQeTdp8", "cUwQnQoE3OqXqSYLT0hv", "custom-navlink", {
 						voA9ZoTTlPFyLpckNw3S: isActive,
 					})}
 					aria-label={localizedApp}

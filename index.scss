@@ -4,6 +4,7 @@
 
 .custom-navlinks-scrollable_container {
     max-width: calc(48px * var(--max-custom-navlink-count) + 8px * (var(--max-custom-navlink-count) - 1));
+    -webkit-app-region: no-drag;
 
     div[role="presentation"] {
         & > * {
@@ -14,4 +15,8 @@
             }
         }
     }
+}
+
+.custom-navlink {
+    -webkit-app-region: unset;
 }
