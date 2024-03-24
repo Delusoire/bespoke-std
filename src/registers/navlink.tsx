@@ -3,7 +3,6 @@ import { S } from "../expose/index.js";
 import { findMatchingPos } from "/hooks/util.js";
 import { createIconComponent } from "../../lib/createIconComponent.js";
 import { registerTransform } from "../../mixin.js";
-import { SVGIcons } from "../static.js";
 
 const registry = new (class extends Registry<React.FC, void> {
 	register(item: React.FC, predicate: Predicate<void>): React.FC {
