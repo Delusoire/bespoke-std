@@ -38,15 +38,9 @@ globalThis.__renderNavLinks = (isTouchscreenUi: boolean) =>
 
 		const children = (
 			<navLinkFactoryCtx.Provider value={navLinkFactory}>
-				{registry.getItems().map(NavLink =>
-					isTouchscreenUi ? (
-						<div className="inline-flex">
-							<NavLink />
-						</div>
-					) : (
-						<NavLink />
-					),
-				)}
+				{registry.getItems().map(NavLink => (
+					<NavLink />
+				))}
 			</navLinkFactoryCtx.Provider>
 		);
 
@@ -64,6 +58,8 @@ registerTransform({
 		str = `${str.slice(0, i)},__renderNavLinks(false)${str.slice(i)}`;
 
 		str = str.replace(/(,[a-zA-Z_\$][\w\$]*===(?:[a-zA-Z_\$][\w\$]*\.){2}HOME_NEXT_TO_NAVIGATION&&.+?)\]/, "$1,__renderNavLinks(true)]");
+
+		str = str.replace(/(\["\/","\/home\/")/, '$1,"/bespoke/*"');
 
 		emit();
 		return str;
@@ -113,45 +109,17 @@ export const NavLinkSidebar = ({ localizedApp, appRoutePath, createIcon, isActiv
 
 export const NavLinkGlobal = ({ localizedApp, appRoutePath, createIcon, isActive }: NavLinkFactoryProps) => {
 	return (
-		<S.ReactComponents.Tooltip label={localizedApp}>
-			<S.ReactComponents.UI.ButtonTertiary
-				iconOnly={createIcon}
-				className={S.classnames("bWBqSiXEceAj1SnzqusU", "jdlOKroADlFeZZQeTdp8", "cUwQnQoE3OqXqSYLT0hv", {
-					voA9ZoTTlPFyLpckNw3S: isActive,
-				})}
-				aria-label={localizedApp}
-				onClick={() => S.Platform.getHistory().push(appRoutePath)}
-			/>
-		</S.ReactComponents.Tooltip>
+		<div className="inline-flex">
+			<S.ReactComponents.Tooltip label={localizedApp}>
+				<S.ReactComponents.UI.ButtonTertiary
+					iconOnly={createIcon}
+					className={S.classnames("bWBqSiXEceAj1SnzqusU", "jdlOKroADlFeZZQeTdp8", "cUwQnQoE3OqXqSYLT0hv", {
+						voA9ZoTTlPFyLpckNw3S: isActive,
+					})}
+					aria-label={localizedApp}
+					onClick={() => S.Platform.getHistory().push(appRoutePath)}
+				/>
+			</S.ReactComponents.Tooltip>
+		</div>
 	);
 };
-
-//! remove in next build
-registry.register(
-	() => <NavLink icon={SVGIcons.x} activeIcon={SVGIcons.x} appRoutePath="/test/1/" localizedApp="Test 1" />,
-	() => true,
-);
-registry.register(
-	() => <NavLink icon={SVGIcons.x} activeIcon={SVGIcons.x} appRoutePath="/test/2/" localizedApp="Test 2" />,
-	() => true,
-);
-registry.register(
-	() => <NavLink icon={SVGIcons.x} activeIcon={SVGIcons.x} appRoutePath="/test/3/" localizedApp="Test 3" />,
-	() => true,
-);
-registry.register(
-	() => <NavLink icon={SVGIcons.x} activeIcon={SVGIcons.x} appRoutePath="/test/4/" localizedApp="Test 4" />,
-	() => true,
-);
-registry.register(
-	() => <NavLink icon={SVGIcons.x} activeIcon={SVGIcons.x} appRoutePath="/test/5/" localizedApp="Test 5" />,
-	() => true,
-);
-registry.register(
-	() => <NavLink icon={SVGIcons.x} activeIcon={SVGIcons.x} appRoutePath="/test/6/" localizedApp="Test 6" />,
-	() => true,
-);
-registry.register(
-	() => <NavLink icon={SVGIcons.x} activeIcon={SVGIcons.x} appRoutePath="/test/7/" localizedApp="Test 7" />,
-	() => true,
-);
