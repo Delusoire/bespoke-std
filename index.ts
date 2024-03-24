@@ -62,11 +62,12 @@ const PlayerAPI = S.Platform.getPlayerAPI();
 const History = S.Platform.getHistory();
 
 const newEventBus = () => {
+	const playerState = PlayerAPI.getState();
 	return {
 		Player: {
-			state_updated: new BehaviorSubject(PlayerAPI.getState()),
-			status_changed: new Subject<any>(),
-			song_changed: new BehaviorSubject(PlayerAPI.getState()),
+			state_updated: new BehaviorSubject(playerState),
+			status_changed: new BehaviorSubject(playerState),
+			song_changed: new BehaviorSubject(playerState),
 		},
 		History: {
 			updated: new BehaviorSubject(History.location),

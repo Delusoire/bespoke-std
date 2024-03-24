@@ -2,7 +2,7 @@ export * from "./src/static.js";
 import { S as _S } from "./src/expose/index.js";
 export const S = _S;
 import { Registrar } from "./src/registers/registers.js";
-import { Subject, BehaviorSubject, Subscription } from "https://esm.sh/rxjs";
+import { BehaviorSubject, Subscription } from "https://esm.sh/rxjs";
 export const createRegistrar = (mod)=>{
     if (!mod.registrar) {
         mod.registrar = new Registrar(mod.getIdentifier());
@@ -56,11 +56,12 @@ export const createLogger = (mod)=>{
 const PlayerAPI = S.Platform.getPlayerAPI();
 const History = S.Platform.getHistory();
 const newEventBus = ()=>{
+    const playerState = PlayerAPI.getState();
     return {
         Player: {
-            state_updated: new BehaviorSubject(PlayerAPI.getState()),
-            status_changed: new Subject(),
-            song_changed: new BehaviorSubject(PlayerAPI.getState())
+            state_updated: new BehaviorSubject(playerState),
+            status_changed: new BehaviorSubject(playerState),
+            song_changed: new BehaviorSubject(playerState)
         },
         History: {
             updated: new BehaviorSubject(History.location)
