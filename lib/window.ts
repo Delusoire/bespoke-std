@@ -31,7 +31,7 @@ export const xfetch = (input: RequestInfo | URL, init?: RequestInit): Promise<Re
 		input.duplex = "half";
 	}
 
-	const request = new Request(`https://bespoke-proxy.delusoire.workers.dev/${url}`, input instanceof Request ? input : undefined);
+	const request = new Request(`https://bespoke-proxy.delusoire.workers.dev/mitm/${url}`, input instanceof Request ? input : undefined);
 
 	return fetch(request, init);
 };
