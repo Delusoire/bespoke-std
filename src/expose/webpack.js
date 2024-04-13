@@ -40,30 +40,43 @@ const exposeReactComponents = (webpack, React, Platform)=>{
         ] : [];
     }));
     const Cards = Object.assign({
-        Default: findBy('"card-click-handler"')(exportedFCs),
-        Hero: findBy('"herocard-click-handler"')(exportedFCs),
-        CardImage: findBy("isHero", "withWaves")(exportedFCs)
-    }, Object.fromEntries(exports.flatMap((m)=>{
-        try {
-            const str = m.toString();
-            const match = str.match(/featureIdentifier:"(.+?)"/);
-            if (!match) return [];
-            const name = match[1];
-            return [
-                [
-                    capitalize(name),
-                    m
-                ]
-            ];
-        } catch (e) {
-            return [];
-        }
-    }).concat([
-        [
-            "Profile",
-            exportedMemos.find((m)=>m.type.toString().includes(`featureIdentifier:"profile"`))
-        ]
-    ])));
+        Generic: findBy("cardPlayButtonFactory", "featureIdentifier", "variant")(exportedFCs),
+        HeroGeneric: findBy("cardPlayButtonFactory", "featureIdentifier", "getSignifierContent")(exportedFCs),
+        CardImage: findBy('"card-image"')(exportedFCs)
+    }, Object.fromEntries([
+        exportedFCs.map((m)=>{
+            try {
+                const str = m.toString();
+                const match = str.match(/featureIdentifier:"(.+?)"/);
+                if (!match) return [];
+                const name = match[1];
+                return [
+                    [
+                        capitalize(name),
+                        m
+                    ]
+                ];
+            } catch (e) {
+                return [];
+            }
+        }),
+        exportedMemos.map((m)=>{
+            try {
+                const str = m.type.toString();
+                const match = str.match(/featureIdentifier:"(.+?)"/);
+                if (!match) return [];
+                const name = match[1];
+                return [
+                    [
+                        capitalize(name),
+                        m
+                    ]
+                ];
+            } catch (e) {
+                return [];
+            }
+        })
+    ].flat(2)));
     const [ContextMenuModuleID] = chunks.find(([_, v])=>v.toString().includes("toggleContextMenu"));
     const [playlistMenuChunkID] = chunks.find(([, v])=>v.toString().includes('value:"playlist"') && v.toString().includes("canView") && v.toString().includes("permissions"));
     const RemoteConfigProviderComponent = findBy("resolveSuspense", "configuration")(exportedFCs);

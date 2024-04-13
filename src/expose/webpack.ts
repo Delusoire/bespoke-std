@@ -169,13 +169,13 @@ const exposeReactComponents = (webpack: Webpack, React: React, Platform: Platfor
 
 	const Cards = Object.assign(
 		{
-			Default: findBy('"card-click-handler"')(exportedFCs),
-			Hero: findBy('"herocard-click-handler"')(exportedFCs),
-			CardImage: findBy("isHero", "withWaves")(exportedFCs),
+			Generic: findBy("cardPlayButtonFactory", "featureIdentifier", "variant")(exportedFCs),
+			HeroGeneric: findBy("cardPlayButtonFactory", "featureIdentifier", "getSignifierContent")(exportedFCs),
+			CardImage: findBy('"card-image"')(exportedFCs),
 		},
 		Object.fromEntries(
-			exports
-				.flatMap(m => {
+			[
+				exportedFCs.map(m => {
 					try {
 						const str = m.toString();
 						const match = str.match(/featureIdentifier:"(.+?)"/);
@@ -185,8 +185,19 @@ const exposeReactComponents = (webpack: Webpack, React: React, Platform: Platfor
 					} catch (e) {
 						return [];
 					}
-				})
-				.concat([["Profile", exportedMemos.find(m => (m as any).type.toString().includes(`featureIdentifier:"profile"`))]]),
+				}),
+				exportedMemos.map(m => {
+					try {
+						const str = m.type.toString();
+						const match = str.match(/featureIdentifier:"(.+?)"/);
+						if (!match) return [];
+						const name = match[1];
+						return [[capitalize(name), m]];
+					} catch (e) {
+						return [];
+					}
+				}),
+			].flat(2),
 		),
 	);
 
