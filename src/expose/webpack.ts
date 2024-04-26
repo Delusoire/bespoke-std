@@ -206,6 +206,8 @@ const exposeReactComponents = (webpack: Webpack, React: React, Platform: Platfor
 		([, v]) => v.toString().includes('value:"playlist"') && v.toString().includes("canView") && v.toString().includes("permissions"),
 	);
 
+	Menus.Playlist = Object.values(require(playlistMenuChunkID)).find(m => typeof m === "function" || typeof m === "object");
+
 	const RemoteConfigProviderComponent = findBy("resolveSuspense", "configuration")(exportedFCs) as React.FC<any>;
 
 	const Slider = exportedFCs.find(m => m.toString().includes("onStepBackward") && !m.toString().includes("volume")) as React.FC<any>;
@@ -262,7 +264,6 @@ const exposeReactComponents = (webpack: Webpack, React: React, Platform: Platfor
 
 		Cards,
 		Menus,
-		PlaylistMenu: Object.values(require(playlistMenuChunkID)).find(m => typeof m === "function" || typeof m === "object"),
 		GenericModal: findBy("GenericModal")(exportedFCs),
 
 		Tracklist: exportedMemos.find(f => f.type.toString().includes("nrValidItems")),

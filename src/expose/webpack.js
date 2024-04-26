@@ -79,6 +79,7 @@ const exposeReactComponents = (webpack, React, Platform)=>{
     ].flat(2)));
     const [ContextMenuModuleID] = chunks.find(([_, v])=>v.toString().includes("toggleContextMenu"));
     const [playlistMenuChunkID] = chunks.find(([, v])=>v.toString().includes('value:"playlist"') && v.toString().includes("canView") && v.toString().includes("permissions"));
+    Menus.Playlist = Object.values(require(playlistMenuChunkID)).find((m)=>typeof m === "function" || typeof m === "object");
     const RemoteConfigProviderComponent = findBy("resolveSuspense", "configuration")(exportedFCs);
     const Slider = exportedFCs.find((m)=>m.toString().includes("onStepBackward") && !m.toString().includes("volume"));
     const exportedMemoFRefs = exportedMemos.filter((m)=>m.type.$$typeof === Symbol.for("react.forward_ref"));
@@ -123,7 +124,6 @@ const exposeReactComponents = (webpack, React, Platform)=>{
         StoreProvider: findBy("notifyNestedSubs", "serverState")(exportedFCs),
         Cards,
         Menus,
-        PlaylistMenu: Object.values(require(playlistMenuChunkID)).find((m)=>typeof m === "function" || typeof m === "object"),
         GenericModal: findBy("GenericModal")(exportedFCs),
         Tracklist: exportedMemos.find((f)=>f.type.toString().includes("nrValidItems")),
         TracklistRow: exportedMemos.find((f)=>f.type.toString().includes("track-icon")),

@@ -11,16 +11,17 @@ const NavToChip = ({ to, title, selected, onClick }) => (
 );
 
 export interface NavBarProps {
+	namespace: string;
 	categories: string[];
 	selectedCategory: string;
 }
-const NavBar = ({ categories, selectedCategory }: NavBarProps) => (
+const NavBar = ({ namespace, categories, selectedCategory }: NavBarProps) => (
 	<div className="fVB_YDdnaDlztX7CcWTA">
 		<div className="e179_Eg8r7Ub6yjjxctr contentSpacing">
 			<div className="VIeVCUUETJyYPCDpsBif">
 				<S.ReactComponents.ScrollableContainer>
 					{categories.map(category => (
-						<NavToChip to={`spotify:app:stats:${category}`} title={category} selected={category === selectedCategory}>
+						<NavToChip to={`spotify:app:bespoke:${namespace}:${category}`} title={category} selected={category === selectedCategory}>
 							{category}
 						</NavToChip>
 					))}
