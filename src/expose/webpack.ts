@@ -274,7 +274,7 @@ const exposeReactComponents = (webpack: Webpack, React: React, Platform: Platfor
 };
 
 const exposeURI = ({ require, chunks }: Webpack) => {
-	const [URIModuleID] = chunks.find(([id, v]) => v.toString().includes("Invalid Spotify URI!") && Object.keys(require(id)).length > 1);
+	const [URIModuleID] = chunks.find(([id, v]) => v.toString().includes("Invalid Spotify URI!") && Object.keys(require(id)).length > 10);
 	const URIModule = require(URIModuleID);
 	const [Types, ...vs] = Object.values(URIModule) as [URITypes, ...Function[]];
 	const TypesKeys = Object.keys(Types);
@@ -343,6 +343,8 @@ const exposeURI = ({ require, chunks }: Webpack) => {
 	const from = findAndExcludeBy("allowedTypes") as (uri: ParsableAsURI) => URIClass<any>;
 	const fromString = findAndExcludeBy("Argument `uri` must be a string.") as (str: string) => URIClass<any>;
 
+	const is_PlaylistV1orV2 = findAndExcludeBy(`${is.Playlist.name}(e)||${is.PlaylistV2.name}(e)`) as IsThisURIType<any>;
+
 	return {
 		Types,
 		isSameIdentity,
@@ -352,7 +354,7 @@ const exposeURI = ({ require, chunks }: Webpack) => {
 		from,
 		fromString,
 		is: Object.assign(is, {
-			PlaylistV1OrV2: uniqueFns[0] as IsThisURIType<any>,
+			PlaylistV1OrV2: is_PlaylistV1orV2,
 		}),
 		create,
 	};

@@ -132,7 +132,7 @@ const exposeReactComponents = (webpack, React, Platform)=>{
     };
 };
 const exposeURI = ({ require, chunks })=>{
-    const [URIModuleID] = chunks.find(([id, v])=>v.toString().includes("Invalid Spotify URI!") && Object.keys(require(id)).length > 1);
+    const [URIModuleID] = chunks.find(([id, v])=>v.toString().includes("Invalid Spotify URI!") && Object.keys(require(id)).length > 10);
     const URIModule = require(URIModuleID);
     const [Types, ...vs] = Object.values(URIModule);
     const TypesKeys = Object.keys(Types);
@@ -159,6 +159,7 @@ const exposeURI = ({ require, chunks })=>{
     const hexToId = findAndExcludeBy("32===");
     const from = findAndExcludeBy("allowedTypes");
     const fromString = findAndExcludeBy("Argument `uri` must be a string.");
+    const is_PlaylistV1orV2 = findAndExcludeBy(`${is.Playlist.name}(e)||${is.PlaylistV2.name}(e)`);
     return {
         Types,
         isSameIdentity,
@@ -168,7 +169,7 @@ const exposeURI = ({ require, chunks })=>{
         from,
         fromString,
         is: Object.assign(is, {
-            PlaylistV1OrV2: uniqueFns[0]
+            PlaylistV1OrV2: is_PlaylistV1orV2
         }),
         create
     };
