@@ -139,7 +139,7 @@ registerTransform({
     then: (SettingsSection)=>{
         S.SettingsSection = SettingsSection;
     },
-    glob: /^\/xpui\.js/,
+    glob: /^\/xpui-routes-desktop-settings\.js/,
     noAwait: true
 });
 registerTransform({
@@ -153,6 +153,6 @@ registerTransform({
     then: (SettingsSectionTitle)=>{
         S.SettingsSectionTitle = SettingsSectionTitle;
     },
-    glob: /^\/xpui\.js/,
+    glob: /^\/xpui-routes-desktop-settings\.js/,
     noAwait: true
 });

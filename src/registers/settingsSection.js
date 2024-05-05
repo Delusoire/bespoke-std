@@ -9,5 +9,6 @@ registerTransform({
             emit();
             return str;
         },
-    glob: /^\/xpui\.js/
+    noAwait: true,
+    glob: /^\/xpui-routes-desktop-settings\.js/
 });
