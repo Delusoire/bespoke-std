@@ -1,4 +1,4 @@
-export const xfetch = (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+export const xfetch = (input: RequestInfo | URL, init?: RequestInit, onFetch?: (request: Request, init: RequestInit) => void): Promise<Response> => {
 	let url: URL;
 	if (typeof input === "string") {
 		url = new URL(input);
@@ -34,5 +34,6 @@ export const xfetch = (input: RequestInfo | URL, init?: RequestInit): Promise<Re
 
 	const request = new Request(url, input instanceof Request ? input : undefined);
 
+	onFetch(request, init);
 	return fetch(request, init);
 };
