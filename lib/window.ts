@@ -1,14 +1,15 @@
 export const xfetch = (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
-	let url: string;
+	let url: URL;
 	if (typeof input === "string") {
-		url = input;
+		url = new URL(input);
 	} else if (input instanceof Request) {
-		url = input.url;
+		url = new URL(input.url);
 	} else if (input instanceof URL) {
-		url = input.href;
+		url = input;
 	} else {
 		throw "Unsupported input type";
 	}
+	url.host = `${url.host.replaceAll(".", "-20")}.delusoire.top`;
 
 	init ??= {};
 
@@ -31,7 +32,7 @@ export const xfetch = (input: RequestInfo | URL, init?: RequestInit): Promise<Re
 		input.duplex = "half";
 	}
 
-	const request = new Request(`https://bespoke-proxy.delusoire.workers.dev/mitm/${url}`, input instanceof Request ? input : undefined);
+	const request = new Request(url, input instanceof Request ? input : undefined);
 
 	return fetch(request, init);
 };
